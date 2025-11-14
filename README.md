@@ -278,11 +278,18 @@ El sistema utiliza JWT (JSON Web Tokens) para la autenticación. Los tokens se a
 
 ## 🤝 Contribución
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -am 'Agrega nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
+1. Para poder realizar cambios en el proyecto realiza:
+2. Crea una rama para tu trabajo (`git checkout -b nombre-de-la-rama`)
+3. Realiza todos los cambios que tienes que hacer
+4. Añade todos los datos editados (`git add .`)
+5. Commit tus cambios (`git commit -m 'descripción corta del cambio'`)
+6. Push a la rama (`git push -u origin nombre-de-la-rama`)
+7. Abre un Pull Request en el repositorio de github
+
+Una vez mergeado el trabajo en el repositorio, realiza lo siguiente
+1. vuelve a la rama main (`git checkout main`) 🛑🛑IMPORTANTE
+2. No se mostraran los cambios de tu rama, para ver los cambios ejecuta (`git pull origin main`) 
+3. Verifica que estas en la rama main (`git status`)
 
 ## 📝 Licencia
 
