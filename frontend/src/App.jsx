@@ -14,6 +14,9 @@ import Mispedidos from "./pages/Mispedidos";
 import VistaProducto from "./pages/vista_producto";
 import LoginModal from "./components/LoginModal";
 import RegistroModal from "./components/RegistroModal";
+import reportesP from "./pages/reportesP";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -26,7 +29,6 @@ function App() {
         position="top-right"
         reverseOrder={false}
         toastOptions={{
-          // Configuración predeterminada
           duration: 4000,
           style: {
             background: '#fff',
@@ -34,7 +36,6 @@ function App() {
             padding: '16px',
             borderRadius: '8px',
           },
-          // Estilos personalizados por tipo
           success: {
             duration: 3000,
             iconTheme: {
@@ -58,14 +59,85 @@ function App() {
       />
 
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/catalogo" element={<Catalogo />} />
-        <Route path="/Miperfil" element={<Miperfil />} />
-        <Route path="/Administrativa" element={<Administrativa />} />
-        <Route path="/Carrito" element={<Carrito />} />
-        <Route path="/Contacto" element={<Contacto />} />
-        <Route path="/Mispedidos" element={<Mispedidos />} />
-        <Route path="/vista_producto" element={<VistaProducto />} />
+        {/* Rutas públicas - accesibles para todos (incluido invitado) */}
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute pagina="home">
+              <Home />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/catalogo" 
+          element={
+            <ProtectedRoute pagina="catalogo">
+              <Catalogo />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/Contacto" 
+          element={
+            <ProtectedRoute pagina="contacto">
+              <Contacto />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/Carrito" 
+          element={
+            <ProtectedRoute pagina="carrito">
+              <Carrito />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/vista_producto" 
+          element={
+            <ProtectedRoute pagina="catalogo">
+              <VistaProducto />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Rutas protegidas - requieren login (usuario, proveedor, administrador) */}
+        <Route 
+          path="/Miperfil" 
+          element={
+            <ProtectedRoute pagina="miperfil">
+              <Miperfil />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/Mispedidos" 
+          element={
+            <ProtectedRoute pagina="mispedidos">
+              <Mispedidos />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Ruta exclusiva para PROVEEDOR */}
+        <Route 
+          path="/reportesP" 
+          element={
+            <ProtectedRoute pagina="reportesP">
+              <reportesP />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Ruta exclusiva para ADMINISTRADOR */}
+        <Route 
+          path="/Administrativa" 
+          element={
+            <ProtectedRoute pagina="administrativa">
+              <Administrativa />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
 
       <Footer />

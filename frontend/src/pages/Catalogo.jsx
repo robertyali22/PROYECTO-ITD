@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { ChevronUp } from "lucide-react";
+import categoriaService from "../services/categoriaService";
+import toast from "react-hot-toast";
 
 export default function Catalogo() {
+  // Estados para categorías y subcategorías de la BD
+  const [categorias, setCategorias] = useState([]);
+  const [subcategorias, setSubcategorias] = useState([]);
+  const [subcategoriasFiltradas, setSubcategoriasFiltradas] = useState([]);
+  
+  // Estados para productos (simulados por ahora)
   const [productos, setProductos] = useState(
     Array.from({ length: 45 }, (_, i) => ({
       id: i + 1,
       nombre: `Producto ${i + 1}`,
-      categoria: ["Electrónica", "Hogar", "Ropa", "Deportes", "Libros"][i % 5],
-      subcategoria: [
-        "Teléfonos", "Decoración", "Computadoras", "Camisetas", "Muebles",
-        "Accesorios", "Electrodomésticos", "Zapatos", "Ropa Deportiva", "Novelas"
-      ][i % 10],
-      precio: Math.floor(Math.random() * 1000) + 10,
-      imagen: `https://source.unsplash.com/400x300/?eco,product,${i + 1}`,
+      categoriaId: (i % 10) + 1, // IDs del 1 al 10
+      subcategoriaId: (i % 50) + 1, // IDs del 1 al 50
+      precio: Math.floor(Math.random() * 100) + 10,
+      imagen: `https://source.unsplash.com/400x300/?food,grocery,${i + 1}`,
       proveedor: `Proveedor-${(i % 5) + 1}`,
       rating: (Math.random() * 2 + 3).toFixed(1),
       reviews: Math.floor(Math.random() * 200) + 10,
@@ -25,19 +30,64 @@ export default function Catalogo() {
   const [filtroPrecio, setFiltroPrecio] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("");
   const [filtroSubcategoria, setFiltroSubcategoria] = useState("");
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [registroModalOpen, setRegistroModalOpen] = useState(false);
   const [paginaActual, setPaginaActual] = useState(1);
+  const [cargando, setCargando] = useState(true);
+  
   const productosPorPagina = 15;
 
+  // Cargar categorías y subcategorías al montar el componente
+  useEffect(() => {
+    cargarDatos();
+  }, []);
+
+  // Filtrar subcategorías cuando cambia la categoría seleccionada
+  useEffect(() => {
+    if (filtroCategoria) {
+      const categoriaSeleccionada = categorias.find(c => c.nombre === filtroCategoria);
+      if (categoriaSeleccionada) {
+        const subsFiltradas = subcategorias.filter(
+          s => s.categoriaId === categoriaSeleccionada.id
+        );
+        setSubcategoriasFiltradas(subsFiltradas);
+      }
+    } else {
+      setSubcategoriasFiltradas(subcategorias);
+    }
+    // Limpiar filtro de subcategoría al cambiar categoría
+    setFiltroSubcategoria("");
+  }, [filtroCategoria, categorias, subcategorias]);
+
+  // Aplicar filtros cuando cambien
   useEffect(() => {
     aplicarFiltros();
-    setPaginaActual(1); // Reset to first page when filters change
+    setPaginaActual(1);
   }, [filtroPrecio, filtroCategoria, filtroSubcategoria]);
+
+  const cargarDatos = async () => {
+    try {
+      setCargando(true);
+      
+      // Cargar categorías
+      const categoriasData = await categoriaService.obtenerCategorias();
+      setCategorias(categoriasData);
+      
+      // Cargar subcategorías
+      const subcategoriasData = await categoriaService.obtenerSubcategorias();
+      setSubcategorias(subcategoriasData);
+      setSubcategoriasFiltradas(subcategoriasData);
+      
+    } catch (error) {
+      toast.error('Error al cargar categorías');
+      console.error(error);
+    } finally {
+      setCargando(false);
+    }
+  };
 
   const aplicarFiltros = () => {
     let filtrados = [...productos];
 
+    // Filtro por precio/popularidad
     if (filtroPrecio === "mayor-menor") {
       filtrados.sort((a, b) => b.precio - a.precio);
     } else if (filtroPrecio === "menor-mayor") {
@@ -48,19 +98,35 @@ export default function Catalogo() {
       filtrados = filtrados.filter((p) => p.masComprado);
     }
 
+    // Filtro por categoría
     if (filtroCategoria) {
-      filtrados = filtrados.filter((p) => p.categoria === filtroCategoria);
+      const categoriaSeleccionada = categorias.find(c => c.nombre === filtroCategoria);
+      if (categoriaSeleccionada) {
+        filtrados = filtrados.filter((p) => p.categoriaId === categoriaSeleccionada.id);
+      }
     }
 
+    // Filtro por subcategoría
     if (filtroSubcategoria) {
-      filtrados = filtrados.filter((p) => p.subcategoria === filtroSubcategoria);
+      const subcategoriaSeleccionada = subcategorias.find(s => s.nombre === filtroSubcategoria);
+      if (subcategoriaSeleccionada) {
+        filtrados = filtrados.filter((p) => p.subcategoriaId === subcategoriaSeleccionada.id);
+      }
     }
 
     setProductosFiltrados(filtrados);
   };
 
-  const categorias = [...new Set(productos.map((p) => p.categoria))];
-  const subcategorias = [...new Set(productos.map((p) => p.subcategoria))];
+  // Obtener nombre de categoría y subcategoría por ID
+  const obtenerNombreCategoria = (categoriaId) => {
+    const categoria = categorias.find(c => c.id === categoriaId);
+    return categoria ? categoria.nombre : 'Sin categoría';
+  };
+
+  const obtenerNombreSubcategoria = (subcategoriaId) => {
+    const subcategoria = subcategorias.find(s => s.id === subcategoriaId);
+    return subcategoria ? subcategoria.nombre : 'Sin subcategoría';
+  };
 
   // Paginación
   const indiceUltimoProducto = paginaActual * productosPorPagina;
@@ -70,15 +136,33 @@ export default function Catalogo() {
 
   const cambiarPagina = (numeroPagina) => {
     setPaginaActual(numeroPagina);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleProductoClick = (productoId) => {
-    window.location.href = `/vista_producto`;
+    window.location.href = `/vista_producto?id=${productoId}`;
   };
+
+  const limpiarFiltros = () => {
+    setFiltroPrecio("");
+    setFiltroCategoria("");
+    setFiltroSubcategoria("");
+    setSubcategoriasFiltradas(subcategorias);
+  };
+
+  if (cargando) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando productos...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-
       <main className="max-w-7xl mx-auto px-6 py-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-8 text-left">
           Catálogo de Productos
@@ -91,7 +175,7 @@ export default function Catalogo() {
             <select
               value={filtroPrecio}
               onChange={(e) => setFiltroPrecio(e.target.value)}
-              className="p-2 border border-gray-300 rounded-lg"
+              className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
             >
               <option value="">Ordenar por...</option>
               <option value="mayor-menor">Precio: Mayor a Menor</option>
@@ -103,12 +187,12 @@ export default function Catalogo() {
             <select
               value={filtroCategoria}
               onChange={(e) => setFiltroCategoria(e.target.value)}
-              className="p-2 border border-gray-300 rounded-lg"
+              className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
             >
               <option value="">Todas las Categorías</option>
               {categorias.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
+                <option key={cat.id} value={cat.nombre}>
+                  {cat.nombre}
                 </option>
               ))}
             </select>
@@ -116,22 +200,19 @@ export default function Catalogo() {
             <select
               value={filtroSubcategoria}
               onChange={(e) => setFiltroSubcategoria(e.target.value)}
-              className="p-2 border border-gray-300 rounded-lg"
+              className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              disabled={!filtroCategoria && subcategoriasFiltradas.length === 0}
             >
               <option value="">Todas las Subcategorías</option>
-              {subcategorias.map((sub) => (
-                <option key={sub} value={sub}>
-                  {sub}
+              {subcategoriasFiltradas.map((sub) => (
+                <option key={sub.id} value={sub.nombre}>
+                  {sub.nombre}
                 </option>
               ))}
             </select>
 
             <button
-              onClick={() => {
-                setFiltroPrecio("");
-                setFiltroCategoria("");
-                setFiltroSubcategoria("");
-              }}
+              onClick={limpiarFiltros}
               className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
             >
               Limpiar Filtros
@@ -139,48 +220,57 @@ export default function Catalogo() {
           </div>
         </div>
 
-        {/* Grid de productos */}
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-8">
-          {productosActuales.map((producto) => (
-            <div
-              key={producto.id}
-              onClick={() => handleProductoClick(producto.id)}
-              className="bg-white shadow-md rounded-xl p-6 hover:drop-shadow-sm transition cursor-pointer"
-            >
-              <img
-                src={producto.imagen}
-                alt={producto.nombre}
-                className="rounded-lg mb-4 w-full h-48 object-cover"
-              />
-              <p className="text-sm text-gray-500 mb-2">
-                {producto.categoria} - {producto.subcategoria}
-              </p>
-              <h3 className="text-xl font-semibold text-gray-800">
-                {producto.nombre}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1 mb-3">
-                por {producto.proveedor}
-              </p>
-              <div className="mt-4 mb-3">
-                <p className="text-lg font-bold text-orange-600 mb-2">
-                  ${producto.precio}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-yellow-400">
-                  {"★".repeat(Math.floor(producto.rating))}
-                  {"☆".repeat(5 - Math.floor(producto.rating))}
-                </span>
-                <span className="text-sm text-gray-600">
-                  ({producto.reviews})
-                </span>
-              </div>
-              <button className="w-full py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
-                Añadir al carrito
-              </button>
-            </div>
-          ))}
+        {/* Resultados */}
+        <div className="mb-4 text-gray-600">
+          Mostrando {productosActuales.length} de {productosFiltrados.length} productos
         </div>
+
+        {/* Grid de productos */}
+        {productosActuales.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No se encontraron productos con los filtros seleccionados</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6">
+            {productosActuales.map((producto) => (
+              <div
+                key={producto.id}
+                onClick={() => handleProductoClick(producto.id)}
+                className="bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition cursor-pointer"
+              >
+                <img
+                  src={producto.imagen}
+                  alt={producto.nombre}
+                  className="rounded-lg mb-3 w-full h-48 object-cover"
+                />
+                <p className="text-xs text-gray-500 mb-2">
+                  {obtenerNombreCategoria(producto.categoriaId)} • {obtenerNombreSubcategoria(producto.subcategoriaId)}
+                </p>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                  {producto.nombre}
+                </h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  por {producto.proveedor}
+                </p>
+                <p className="text-xl font-bold text-orange-600 mb-2">
+                  S/ {producto.precio.toFixed(2)}
+                </p>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-yellow-400 text-sm">
+                    {"★".repeat(Math.floor(producto.rating))}
+                    {"☆".repeat(5 - Math.floor(producto.rating))}
+                  </span>
+                  <span className="text-xs text-gray-600">
+                    ({producto.reviews})
+                  </span>
+                </div>
+                <button className="w-full py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm">
+                  Añadir al carrito
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Paginación */}
         {totalPaginas > 1 && (
@@ -194,19 +284,32 @@ export default function Catalogo() {
                 Anterior
               </button>
 
-              {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((numero) => (
-                <button
-                  key={numero}
-                  onClick={() => cambiarPagina(numero)}
-                  className={`px-4 py-2 rounded-lg transition ${
-                    paginaActual === numero
-                      ? "bg-orange-600 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  {numero}
-                </button>
-              ))}
+              {Array.from({ length: Math.min(totalPaginas, 5) }, (_, i) => {
+                let pageNumber;
+                if (totalPaginas <= 5) {
+                  pageNumber = i + 1;
+                } else if (paginaActual <= 3) {
+                  pageNumber = i + 1;
+                } else if (paginaActual >= totalPaginas - 2) {
+                  pageNumber = totalPaginas - 4 + i;
+                } else {
+                  pageNumber = paginaActual - 2 + i;
+                }
+
+                return (
+                  <button
+                    key={pageNumber}
+                    onClick={() => cambiarPagina(pageNumber)}
+                    className={`px-4 py-2 rounded-lg transition ${
+                      paginaActual === pageNumber
+                        ? "bg-orange-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
 
               <button
                 onClick={() => cambiarPagina(paginaActual + 1)}
@@ -228,7 +331,6 @@ export default function Catalogo() {
           <ChevronUp size={24} />
         </button>
       </main>
-
     </div>
   );
 }

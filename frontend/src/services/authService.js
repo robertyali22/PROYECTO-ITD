@@ -70,6 +70,33 @@ const authService = {
   isAuthenticated() {
     return !!this.getToken() && !!this.getCurrentUser();
   },
+
+  /**
+   * Obtiene el rol del usuario actual
+   * @returns {string} Rol del usuario o 'invitado' si no está logueado
+   */
+  getUserRole() {
+    const usuario = this.getCurrentUser();
+    return usuario?.rol || 'invitado';
+  },
+
+  /**
+   * Verifica si el usuario tiene un rol específico
+   * @param {string} rol - Rol a verificar
+   * @returns {boolean}
+   */
+  hasRole(rol) {
+    return this.getUserRole() === rol;
+  },
+
+  /**
+   * Verifica si el usuario tiene alguno de los roles especificados
+   * @param {string[]} roles - Array de roles permitidos
+   * @returns {boolean}
+   */
+  hasAnyRole(roles) {
+    return roles.includes(this.getUserRole());
+  },
 };
 
 export default authService;

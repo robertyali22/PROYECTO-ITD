@@ -6,6 +6,8 @@ import {
   Package,
   LogOut,
   ShoppingCart,
+  BarChart3,
+  Shield,
 } from "lucide-react";
 import authService from "../services/authService";
 import toast from "react-hot-toast";
@@ -38,7 +40,7 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
     setUsuario(null);
     setMenuAbierto(false);
     toast.success("Sesión cerrada correctamente");
-    window.location.reload();
+    window.location.href = "/";
   };
 
   const handleNavigate = (path) => {
@@ -46,10 +48,24 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
     window.location.href = path;
   };
 
+  // Función para verificar si el usuario puede acceder a una ruta
+  const canAccess = (pagina) => {
+    const rol = usuario?.rol || 'invitado';
+    
+    const permisos = {
+      miperfil: ['usuario', 'proveedor', 'administrador'],
+      mispedidos: ['usuario', 'proveedor', 'administrador'],
+      reportesP: ['proveedor'],
+      administrativa: ['administrador'],
+    };
+
+    return permisos[pagina]?.includes(rol);
+  };
+
   return (
     <nav className="bg-white shadow-md border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        {/* Logo: ahora es botón que navega a home */}
+        {/* Logo */}
         <button
           onClick={() => (window.location.href = "/")}
           aria-label="Ir a inicio"
@@ -66,7 +82,10 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
             </a>
           </li>
           <li className="hover:text-orange-600 cursor-pointer transition-colors">
-            <a href="/catalogo" className="transition-colors hover:cursor-pointer">
+            <a
+              href="/catalogo"
+              className="transition-colors hover:cursor-pointer"
+            >
               Productos
             </a>
           </li>
@@ -74,7 +93,10 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
             Ofertas
           </li>
           <li className="hover:text-orange-600 cursor-pointer transition-colors">
-            <a href="/Contacto" className="transition-colors hover:cursor-pointer">
+            <a
+              href="/Contacto"
+              className="transition-colors hover:cursor-pointer"
+            >
               Contacto
             </a>
           </li>
@@ -109,23 +131,54 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
                       {usuario.nombre} {usuario.apellido}
                     </p>
                     <p className="text-xs text-gray-500">{usuario.email}</p>
+                    <p className="text-xs text-orange-600 font-medium mt-1">
+                      {usuario.rol.toUpperCase()}
+                    </p>
                   </div>
 
-                  <button
-                    onClick={() => handleNavigate("/miperfil")}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition hover:cursor-pointer"
-                  >
-                    <UserCircle size={18} />
-                    <span>Mi Perfil</span>
-                  </button>
+                  {/* Mi Perfil - Visible para usuario, proveedor, administrador */}
+                  {canAccess('miperfil') && (
+                    <button
+                      onClick={() => handleNavigate("/miperfil")}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition hover:cursor-pointer"
+                    >
+                      <UserCircle size={18} />
+                      <span>Mi Perfil</span>
+                    </button>
+                  )}
 
-                  <button
-                    onClick={() => handleNavigate("/mispedidos")}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition hover:cursor-pointer"
-                  >
-                    <Package size={18} />
-                    <span>Mis Pedidos</span>
-                  </button>
+                  {/* Mis Pedidos - Visible para usuario, proveedor, administrador */}
+                  {canAccess('mispedidos') && (
+                    <button
+                      onClick={() => handleNavigate("/mispedidos")}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition hover:cursor-pointer"
+                    >
+                      <Package size={18} />
+                      <span>Mis Pedidos</span>
+                    </button>
+                  )}
+
+                  {/* Panel Proveedor - Solo visible para proveedor */}
+                  {canAccess('reportesP') && (
+                    <button
+                      onClick={() => handleNavigate("/reportesP")}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition hover:cursor-pointer"
+                    >
+                      <BarChart3 size={18} />
+                      <span>Panel Proveedor</span>
+                    </button>
+                  )}
+
+                  {/* Panel Administrativo - Solo visible para administrador */}
+                  {canAccess('administrativa') && (
+                    <button
+                      onClick={() => handleNavigate("/Administrativa")}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition hover:cursor-pointer"
+                    >
+                      <Shield size={18} />
+                      <span>Administración</span>
+                    </button>
+                  )}
 
                   <div className="border-t border-gray-100 mt-2 pt-2">
                     <button
@@ -157,8 +210,9 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
             </>
           )}
 
-          {/* Icono del carrito: siempre visible a la derecha */}
+          {/* Icono del carrito: siempre visible */}
           <button
+            onClick={() => handleNavigate("/Carrito")}
             className="p-2 text-gray-700 hover:text-orange-700 transition hover:cursor-pointer"
             aria-label="Ver carrito"
           >

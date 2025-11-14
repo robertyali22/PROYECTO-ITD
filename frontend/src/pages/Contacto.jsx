@@ -14,10 +14,10 @@ export default function Contacto() {
         <p className="text-lg text-gray-700 max-w-md mx-auto">
           Robert es machazo
         </p>
+        <p className="text-lg text-gray-700 max-w-md mx-auto">
+          A efrain le duele su potito que liko{" "}
+        </p>
       </div>
-      <p className="text-lg text-gray-700 max-w-md mx-auto">
-        A efrain le duele su potito que liko{" "}
-      </p>
     </div>
   );
 }
