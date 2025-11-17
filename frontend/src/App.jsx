@@ -12,9 +12,10 @@ import Carrito from "./pages/Carrito";
 import Contacto from "./pages/Contacto";
 import Mispedidos from "./pages/Mispedidos";
 import VistaProducto from "./pages/vista_producto";
+import SolicitarProveedor from "./pages/SolicitarProveedor";
+import ReportesP from "./pages/reportesP";
 import LoginModal from "./components/LoginModal";
 import RegistroModal from "./components/RegistroModal";
-import reportesP from "./pages/reportesP";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 
@@ -118,13 +119,23 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        
+        {/* Ruta para solicitar ser proveedor - requiere login */}
+        <Route 
+          path="/solicitar-proveedor" 
+          element={
+            <ProtectedRoute pagina="solicitarproveedor">
+              <SolicitarProveedor />
+            </ProtectedRoute>
+          } 
+        />
 
         {/* Ruta exclusiva para PROVEEDOR */}
         <Route 
-          path="/reportesP" 
+          path="/ReportesP" 
           element={
-            <ProtectedRoute pagina="reportesP">
-              <reportesP />
+            <ProtectedRoute pagina="ReportesP">
+              <ReportesP />
             </ProtectedRoute>
           } 
         />

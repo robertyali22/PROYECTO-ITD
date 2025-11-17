@@ -183,8 +183,10 @@ public class ProveedorController {
      * Cambiar estado de solicitud (admin)
      * PATCH /api/admin/proveedores/{proveedorId}/estado
      */
+    
     @PatchMapping("/admin/proveedores/{proveedorId}/estado")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @CrossOrigin(origins = "http://localhost:5173")
     public ResponseEntity<Map<String, Object>> cambiarEstadoSolicitud(
             @PathVariable Long proveedorId,
             @Valid @RequestBody CambiarEstadoProveedorDTO dto) {

@@ -10,6 +10,7 @@ export default function reportesP() {
         <p className="text-lg text-gray-700 max-w-md mx-auto">
           error 404, la pagina esta en proceso de creación, espere para proximas versiones profesor, estamos trabajando en ello, robert chambea
         </p>
+        <p>pinga pinga</p>
       </div>
     </div>
   );

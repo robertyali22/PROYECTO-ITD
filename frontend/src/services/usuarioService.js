@@ -59,6 +59,29 @@ const usuarioService = {
       throw error;
     }
   },
+  async obtenerUsuarios() {
+  try {
+    const token = localStorage.getItem('token'); // tu panel admin necesita JWT
+
+    const response = await fetch(API_ENDPOINTS.ADMIN_LISTAR_USUARIOS, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al obtener usuarios');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error en obtenerUsuarios:', error);
+    throw error;
+  }
+},
+
 };
 
 export default usuarioService;

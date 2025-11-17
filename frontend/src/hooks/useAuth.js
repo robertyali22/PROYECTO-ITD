@@ -61,9 +61,10 @@ export const useAuth = () => {
       // Páginas que requieren login
       miperfil: ['usuario', 'proveedor', 'administrador'],
       mispedidos: ['usuario', 'proveedor', 'administrador'],
+      solicitarproveedor: ['usuario', 'proveedor', 'administrador'],
       
       // Página exclusiva de proveedor
-      reportesP: ['proveedor'],
+      ReportesP: ['proveedor'],
       
       // Página exclusiva de administrador
       administrativa: ['administrador'],

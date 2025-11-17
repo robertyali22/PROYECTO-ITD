@@ -146,6 +146,9 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="text-sm font-semibold text-gray-800">{usuario.nombre} {usuario.apellido}</p>
                       <p className="text-xs text-gray-500">{usuario.email}</p>
+                      <p className="text-xs text-orange-600 font-medium mt-1">
+                      {usuario.rol.toUpperCase()}
+                    </p>
                     </div>
 
                     <button onClick={() => handleNavigate("/miperfil")} className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition">
@@ -155,6 +158,17 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
                     <button onClick={() => handleNavigate("/mispedidos")} className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition">
                       <Package size={16} /> <span>Mis Pedidos</span>
                     </button>
+
+                    {usuario?.rol === 'administrador' && (
+                      <button onClick={() => handleNavigate("/Administrativa")} className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition">
+                        <Package size={16} /> <span>Administrativa</span>
+                      </button>
+                    )}
+                    {usuario?.rol === 'proveedor' && (
+                      <button onClick={() => handleNavigate("/reportesP")} className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition">
+                        <Package size={16} /> <span>Mis reportes</span>
+                      </button>
+                    )}
 
                     <div className="border-t border-gray-100 mt-2 pt-2">
                       <button onClick={handleCerrarSesion} className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
@@ -227,7 +241,7 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
                 <a href="/catalogo" className="px-3 py-2 rounded-md hover:bg-orange-50 hover:text-orange-600 transition">Productos</a>
                 <a href="/ofertas" className="px-3 py-2 rounded-md hover:bg-orange-50 hover:text-orange-600 transition">Ofertas</a>
                 <a href="/contacto" className="px-3 py-2 rounded-md hover:bg-orange-50 hover:text-orange-600 transition">Contacto</a>
-                <button onClick={() => handleNavigate("/SolicitudProveedor")} className="px-3 py-2 rounded-md hover:bg-orange-50 hover:text-orange-600 transition">Sé socio</button>
+                <button onClick={() => handleNavigate("/solicitar-proveedor")} className="px-3 py-2 rounded-md hover:bg-orange-50 hover:text-orange-600 transition">Sé socio</button>
               </nav>
             </div>
 
