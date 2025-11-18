@@ -370,7 +370,7 @@ export default function Catalogo() {
                       ({Math.floor(producto.calificacionPromedio || 0)})
                     </span>
                   </div>
-                  <div className="flex-grow"></div>
+                  <div className="grow"></div>
                   <button className="w-full py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm mt-auto">
                     Añadir al carrito
                   </button>
