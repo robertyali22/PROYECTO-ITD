@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ChevronUp } from "lucide-react";
 import categoriaService from "../services/categoriaService";
+import productoService from "../services/productoService";
 import toast from "react-hot-toast";
 
 export default function Catalogo() {
@@ -9,24 +10,9 @@ export default function Catalogo() {
   const [subcategorias, setSubcategorias] = useState([]);
   const [subcategoriasFiltradas, setSubcategoriasFiltradas] = useState([]);
   
-  // Estados para productos (simulados por ahora)
-  const [productos, setProductos] = useState(
-    Array.from({ length: 45 }, (_, i) => ({
-      id: i + 1,
-      nombre: `Producto ${i + 1}`,
-      categoriaId: (i % 10) + 1, // IDs del 1 al 10
-      subcategoriaId: (i % 50) + 1, // IDs del 1 al 50
-      precio: Math.floor(Math.random() * 100) + 10,
-      imagen: `https://source.unsplash.com/400x300/?food,grocery,${i + 1}`,
-      proveedor: `Proveedor-${(i % 5) + 1}`,
-      rating: (Math.random() * 2 + 3).toFixed(1),
-      reviews: Math.floor(Math.random() * 200) + 10,
-      popular: Math.random() > 0.5,
-      masComprado: Math.random() > 0.5,
-    }))
-  );
-
-  const [productosFiltrados, setProductosFiltrados] = useState(productos);
+  // Estados para productos de la BD
+  const [productos, setProductos] = useState([]);
+  const [productosFiltrados, setProductosFiltrados] = useState([]);
   const [filtroPrecio, setFiltroPrecio] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("");
   const [filtroSubcategoria, setFiltroSubcategoria] = useState("");
@@ -76,8 +62,20 @@ export default function Catalogo() {
       setSubcategorias(subcategoriasData);
       setSubcategoriasFiltradas(subcategoriasData);
       
+      // Cargar productos de la BD
+      const productosResponse = await productoService.obtenerProductosPublicos();
+      const productosData = productosResponse.data || productosResponse;
+      
+      if (Array.isArray(productosData)) {
+        setProductos(productosData);
+        setProductosFiltrados(productosData);
+      } else {
+        toast.error('Error al procesar los productos');
+        console.error('Estructura inesperada:', productosResponse);
+      }
+      
     } catch (error) {
-      toast.error('Error al cargar categorías');
+      toast.error('Error al cargar datos');
       console.error(error);
     } finally {
       setCargando(false);
@@ -87,15 +85,11 @@ export default function Catalogo() {
   const aplicarFiltros = () => {
     let filtrados = [...productos];
 
-    // Filtro por precio/popularidad
+    // Filtro por precio
     if (filtroPrecio === "mayor-menor") {
-      filtrados.sort((a, b) => b.precio - a.precio);
+      filtrados.sort((a, b) => parseFloat(b.precioUnitario) - parseFloat(a.precioUnitario));
     } else if (filtroPrecio === "menor-mayor") {
-      filtrados.sort((a, b) => a.precio - b.precio);
-    } else if (filtroPrecio === "populares") {
-      filtrados = filtrados.filter((p) => p.popular);
-    } else if (filtroPrecio === "mas-comprados") {
-      filtrados = filtrados.filter((p) => p.masComprado);
+      filtrados.sort((a, b) => parseFloat(a.precioUnitario) - parseFloat(b.precioUnitario));
     }
 
     // Filtro por categoría
@@ -180,8 +174,6 @@ export default function Catalogo() {
               <option value="">Ordenar por...</option>
               <option value="mayor-menor">Precio: Mayor a Menor</option>
               <option value="menor-mayor">Precio: Menor a Mayor</option>
-              <option value="populares">Populares</option>
-              <option value="mas-comprados">Más Comprados</option>
             </select>
 
             <select
@@ -236,37 +228,58 @@ export default function Catalogo() {
               <div
                 key={producto.id}
                 onClick={() => handleProductoClick(producto.id)}
-                className="bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition cursor-pointer"
+                className="bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition cursor-pointer flex flex-col h-full relative"
               >
+                {/* Badge de descuento si existe */}
+                {producto.descuentoPorcentaje && (
+                  <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+                    -{producto.descuentoPorcentaje}%
+                  </span>
+                )}
                 <img
-                  src={producto.imagen}
+                  src={producto.imagenes && producto.imagenes.length > 0 ? producto.imagenes[0].urlImagen : 'https://via.placeholder.com/400x300?text=Sin+Imagen'}
                   alt={producto.nombre}
                   className="rounded-lg mb-3 w-full h-48 object-cover"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/400x300?text=Sin+Imagen';
+                  }}
                 />
-                <p className="text-xs text-gray-500 mb-2">
-                  {obtenerNombreCategoria(producto.categoriaId)} • {obtenerNombreSubcategoria(producto.subcategoriaId)}
-                </p>
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                  {producto.nombre}
-                </h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  por {producto.proveedor}
-                </p>
-                <p className="text-xl font-bold text-orange-600 mb-2">
-                  S/ {producto.precio.toFixed(2)}
-                </p>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-yellow-400 text-sm">
-                    {"★".repeat(Math.floor(producto.rating))}
-                    {"☆".repeat(5 - Math.floor(producto.rating))}
-                  </span>
-                  <span className="text-xs text-gray-600">
-                    ({producto.reviews})
-                  </span>
+                <div className="flex flex-col flex-1 w-full">
+                  <p className="text-xs text-gray-500 mb-2">
+                    {producto.categoriaNombre || obtenerNombreCategoria(producto.categoriaId)}
+                    {producto.subcategoriaNombre && ` • ${producto.subcategoriaNombre}`}
+                  </p>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-2">
+                    {producto.nombre}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    por {producto.nombreEmpresa || 'Proveedor'}
+                  </p>
+                  {/* Precios alineados, colores originales */}
+                  <div className="mb-2">
+                    <span className="block text-xs text-orange-600 font-bold">Precio Online</span>
+                    <span className="block text-xl font-bold text-orange-600">
+                      S/ {parseFloat(producto.precioUnitario).toFixed(2)}
+                    </span>
+                    {/* Precio regular tachado si existe producto.precioRegular */}
+                    {producto.precioRegular && (
+                      <span className="block text-xs text-gray-500 line-through">S/ {parseFloat(producto.precioRegular).toFixed(2)}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-yellow-400 text-sm">
+                      {"★".repeat(Math.floor(producto.calificacionPromedio || 3))}
+                      {"☆".repeat(5 - Math.floor(producto.calificacionPromedio || 3))}
+                    </span>
+                    <span className="text-xs text-gray-600">
+                      ({Math.floor(producto.calificacionPromedio || 0)})
+                    </span>
+                  </div>
+                  <div className="flex-grow"></div>
+                  <button className="w-full py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm mt-auto">
+                    Añadir al carrito
+                  </button>
                 </div>
-                <button className="w-full py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm">
-                  Añadir al carrito
-                </button>
               </div>
             ))}
           </div>
