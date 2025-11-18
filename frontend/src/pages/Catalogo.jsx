@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { ChevronUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import categoriaService from "../services/categoriaService";
 import productoService from "../services/productoService";
 import toast from "react-hot-toast";
 
 export default function Catalogo() {
+  const navigate = useNavigate();
   // Estados para categorías y subcategorías de la BD
   const [categorias, setCategorias] = useState([]);
   const [subcategorias, setSubcategorias] = useState([]);
@@ -134,7 +136,8 @@ export default function Catalogo() {
   };
 
   const handleProductoClick = (productoId) => {
-    window.location.href = `/vista_producto?id=${productoId}`;
+    console.log("Click en producto:", productoId);
+    navigate(`/vista_producto?id=${productoId}`);
   };
 
   const limpiarFiltros = () => {

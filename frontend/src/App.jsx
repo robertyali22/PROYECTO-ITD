@@ -99,7 +99,7 @@ function App() {
         <Route 
           path="/vista_producto" 
           element={
-            <ProtectedRoute pagina="VistaProducto">
+            <ProtectedRoute pagina="VistaProducto" requiereAuth={false}>
               <VistaProducto />
             </ProtectedRoute>
           } 

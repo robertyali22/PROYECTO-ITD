@@ -20,6 +20,11 @@ export default function ProtectedRoute({ children, pagina, requiereAuth = true }
     );
   }
 
+  // Si la ruta no requiere autenticación, permitir acceso directo
+  if (!requiereAuth) {
+    return children;
+  }
+
   // Verificar si el usuario puede acceder a esta página
   if (!canAccess(pagina)) {
     const rol = getRol();

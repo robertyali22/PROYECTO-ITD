@@ -1,11 +1,13 @@
 // src/pages/Home.jsx
 import React, { useState, useEffect } from "react";
 import { ChevronUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Hero from "../components/Hero";
 import productoService from "../services/productoService";
 import toast from "react-hot-toast";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
 
@@ -50,11 +52,12 @@ export default function Home() {
   };
 
   const handleProductoClick = (productoId) => {
-    window.location.href = `/vista_producto?id=${productoId}`;
+    console.log("Click en producto:", productoId);
+    navigate(`/vista_producto?id=${productoId}`);
   };
 
   const irAlCatalogo = () => {
-    window.location.href = '/catalogo';
+    navigate('/catalogo');
   };
 
   return (
