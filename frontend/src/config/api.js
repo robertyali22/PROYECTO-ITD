@@ -12,12 +12,28 @@ export const API_ENDPOINTS = {
   MI_SOLICITUD: `${API_BASE_URL}/usuario/proveedor/mi-solicitud`,
   VERIFICAR_SOLICITUD: `${API_BASE_URL}/usuario/proveedor/verificar`,
 
-  // Admin (opcional)
+  // Admin
   ADMIN_SOLICITUDES: `${API_BASE_URL}/admin/proveedores/solicitudes`,
   ADMIN_SOLICITUDES_PENDIENTES: `${API_BASE_URL}/admin/proveedores/solicitudes/pendientes`,
   ADMIN_CAMBIAR_ESTADO: (id) => `${API_BASE_URL}/admin/proveedores/${id}/estado`,
   ADMIN_LISTAR_USUARIOS: `${API_BASE_URL}/admin/usuarios/lista`,
 
+  // Productos - Proveedor
+  PROVEEDOR_PRODUCTOS: `${API_BASE_URL}/proveedor/productos`,
+  PROVEEDOR_PRODUCTO_DETALLE: (id) => `${API_BASE_URL}/proveedor/productos/${id}`,
+  PROVEEDOR_PRODUCTO_ACTUALIZAR: (id) => `${API_BASE_URL}/proveedor/productos/${id}`,
+  PROVEEDOR_PRODUCTO_ELIMINAR: (id) => `${API_BASE_URL}/proveedor/productos/${id}`,
+  PROVEEDOR_AGREGAR_IMAGEN: (productoId) => `${API_BASE_URL}/proveedor/productos/${productoId}/imagenes`,
+  PROVEEDOR_ELIMINAR_IMAGEN: (productoId, imagenId) => `${API_BASE_URL}/proveedor/productos/${productoId}/imagenes/${imagenId}`,
+
+  // Productos - Público
+  PUBLIC_PRODUCTOS: `${API_BASE_URL}/public/productos`,
+  PUBLIC_PRODUCTOS_CATEGORIA: (categoriaId) => `${API_BASE_URL}/public/productos/categoria/${categoriaId}`,
+
+  // Categorías - Público
+  PUBLIC_CATEGORIAS: `${API_BASE_URL}/public/categorias`,
+  PUBLIC_SUBCATEGORIAS: `${API_BASE_URL}/public/categorias/subcategorias`,
+  PUBLIC_SUBCATEGORIAS_POR_CATEGORIA: (categoriaId) => `${API_BASE_URL}/public/categorias/${categoriaId}/subcategorias`,
 };
 
 export default API_BASE_URL;

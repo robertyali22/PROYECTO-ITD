@@ -1,22 +1,25 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+import { API_ENDPOINTS } from '../config/api';
 
 /**
- * Servicio para manejar categorías y subcategorías
+ * Servicio para manejar operaciones relacionadas con categorías y subcategorías
  */
 const categoriaService = {
   /**
    * Obtiene todas las categorías
+   * @returns {Promise<Array>} Lista de categorías
    */
   async obtenerCategorias() {
     try {
-      const response = await fetch(`${API_BASE_URL}/public/categorias`);
-      const data = await response.json();
+      const response = await fetch(API_ENDPOINTS.PUBLIC_CATEGORIAS, {
+        method: 'GET',
+      });
 
       if (!response.ok) {
-        throw new Error(data.message || 'Error al obtener categorías');
+        throw new Error('Error al obtener categorías');
       }
 
-      return data.data;
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error('Error en obtenerCategorias:', error);
       throw error;
@@ -25,17 +28,20 @@ const categoriaService = {
 
   /**
    * Obtiene todas las subcategorías
+   * @returns {Promise<Array>} Lista de subcategorías
    */
   async obtenerSubcategorias() {
     try {
-      const response = await fetch(`${API_BASE_URL}/public/categorias/subcategorias`);
-      const data = await response.json();
+      const response = await fetch(API_ENDPOINTS.PUBLIC_SUBCATEGORIAS, {
+        method: 'GET',
+      });
 
       if (!response.ok) {
-        throw new Error(data.message || 'Error al obtener subcategorías');
+        throw new Error('Error al obtener subcategorías');
       }
 
-      return data.data;
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error('Error en obtenerSubcategorias:', error);
       throw error;
@@ -43,18 +49,25 @@ const categoriaService = {
   },
 
   /**
-   * Obtiene subcategorías de una categoría específica
+   * Obtiene subcategorías por categoría
+   * @param {number} categoriaId - ID de la categoría
+   * @returns {Promise<Array>} Lista de subcategorías
    */
   async obtenerSubcategoriasPorCategoria(categoriaId) {
     try {
-      const response = await fetch(`${API_BASE_URL}/public/categorias/${categoriaId}/subcategorias`);
-      const data = await response.json();
+      const response = await fetch(
+        API_ENDPOINTS.PUBLIC_SUBCATEGORIAS_POR_CATEGORIA(categoriaId),
+        {
+          method: 'GET',
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(data.message || 'Error al obtener subcategorías');
+        throw new Error('Error al obtener subcategorías');
       }
 
-      return data.data;
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error('Error en obtenerSubcategoriasPorCategoria:', error);
       throw error;

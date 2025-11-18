@@ -14,10 +14,12 @@ import Mispedidos from "./pages/Mispedidos";
 import VistaProducto from "./pages/vista_producto";
 import SolicitarProveedor from "./pages/SolicitarProveedor";
 import ReportesP from "./pages/reportesP";
+import MisProductos from "./pages/Misproductos";
+import CrearProducto from "./pages/CrearProducto";
+import EditarProducto from "./pages/EditarProducto";
 import LoginModal from "./components/LoginModal";
 import RegistroModal from "./components/RegistroModal";
 import ProtectedRoute from "./components/ProtectedRoute";
-
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -60,7 +62,8 @@ function App() {
       />
 
       <Routes>
-        {/* Rutas públicas - accesibles para todos (incluido invitado) */}
+        {/* ========== RUTAS PÚBLICAS ========== */}
+        {/* Accesibles para todos (incluido invitado) */}
         <Route 
           path="/" 
           element={
@@ -102,7 +105,8 @@ function App() {
           } 
         />
 
-        {/* Rutas protegidas - requieren login (usuario, proveedor, administrador) */}
+        {/* ========== RUTAS PROTEGIDAS ========== */}
+        {/* Requieren login (usuario, proveedor, administrador) */}
         <Route 
           path="/Miperfil" 
           element={
@@ -130,7 +134,10 @@ function App() {
           } 
         />
 
-        {/* Ruta exclusiva para PROVEEDOR */}
+        {/* ========== RUTAS EXCLUSIVAS PARA PROVEEDOR ========== */}
+        {/* Solo accesibles para usuarios con rol 'proveedor' */}
+        
+        {/* Reportes del proveedor */}
         <Route 
           path="/ReportesP" 
           element={
@@ -140,7 +147,36 @@ function App() {
           } 
         />
 
-        {/* Ruta exclusiva para ADMINISTRADOR */}
+        {/* Gestión de productos */}
+        <Route 
+          path="/proveedor/productos" 
+          element={
+            <ProtectedRoute pagina="misproductos">
+              <MisProductos />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/proveedor/productos/nuevo" 
+          element={
+            <ProtectedRoute pagina="crearproducto">
+              <CrearProducto />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/proveedor/productos/editar/:id" 
+          element={
+            <ProtectedRoute pagina="editarproducto">
+              <EditarProducto />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* ========== RUTAS EXCLUSIVAS PARA ADMINISTRADOR ========== */}
+        {/* Solo accesibles para usuarios con rol 'administrador' */}
         <Route 
           path="/Administrativa" 
           element={

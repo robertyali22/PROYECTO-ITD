@@ -165,9 +165,14 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
                       </button>
                     )}
                     {usuario?.rol === 'proveedor' && (
-                      <button onClick={() => handleNavigate("/reportesP")} className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition">
-                        <Package size={16} /> <span>Mis reportes</span>
-                      </button>
+                      <>
+                        <button onClick={() => handleNavigate("/proveedor/productos")} className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition">
+                          <Package size={16} /> <span>Mis productos</span>
+                        </button>
+                        <button onClick={() => handleNavigate("/proveedor/productos/nuevo")} className="w-full flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition">
+                          <Package size={16} /> <span>Crear producto</span>
+                        </button>
+                      </>
                     )}
 
                     <div className="border-t border-gray-100 mt-2 pt-2">

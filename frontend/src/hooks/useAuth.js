@@ -63,14 +63,38 @@ export const useAuth = () => {
       mispedidos: ['usuario', 'proveedor', 'administrador'],
       solicitarproveedor: ['usuario', 'proveedor', 'administrador'],
       
-      // Página exclusiva de proveedor
+      // Páginas exclusivas de proveedor
       ReportesP: ['proveedor'],
+      misproductos: ['proveedor'],
+      crearproducto: ['proveedor'],
+      editarproducto: ['proveedor'],
       
       // Página exclusiva de administrador
       administrativa: ['administrador'],
     };
 
     return permisos[pagina]?.includes(rol) || false;
+  };
+
+  /**
+   * Verifica si el usuario actual es proveedor
+   */
+  const isProveedor = () => {
+    return hasRole('proveedor');
+  };
+
+  /**
+   * Verifica si el usuario actual es administrador
+   */
+  const isAdmin = () => {
+    return hasRole('administrador');
+  };
+
+  /**
+   * Verifica si el usuario actual es un usuario normal
+   */
+  const isUsuario = () => {
+    return hasRole('usuario');
   };
 
   return {
@@ -81,5 +105,8 @@ export const useAuth = () => {
     hasRole,
     hasAnyRole,
     canAccess,
+    isProveedor,
+    isAdmin,
+    isUsuario,
   };
 };
