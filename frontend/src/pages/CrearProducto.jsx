@@ -44,10 +44,8 @@ export default function CrearProducto() {
 
   const cargarCategorias = async () => {
     try {
-      const response = await categoriaService.obtenerCategorias();
-      if (response.success) {
-        setCategorias(response.data);
-      }
+      const data = await categoriaService.obtenerCategorias();
+    setCategorias(data);
     } catch (err) {
       console.error('Error al cargar categorías:', err);
     }
@@ -55,10 +53,8 @@ export default function CrearProducto() {
 
   const cargarSubcategorias = async (categoriaId) => {
     try {
-      const response = await categoriaService.obtenerSubcategoriasPorCategoria(categoriaId);
-      if (response.success) {
-        setSubcategorias(response.data);
-      }
+      const data = await categoriaService.obtenerSubcategoriasPorCategoria(categoriaId);
+    setSubcategorias(data);
     } catch (err) {
       console.error('Error al cargar subcategorías:', err);
     }

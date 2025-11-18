@@ -73,9 +73,9 @@ function App() {
           } 
         />
         <Route 
-          path="/catalogo" 
+          path="/Catalogo" 
           element={
-            <ProtectedRoute pagina="catalogo">
+            <ProtectedRoute pagina="Catalogo">
               <Catalogo />
             </ProtectedRoute>
           } 
@@ -91,7 +91,7 @@ function App() {
         <Route 
           path="/Carrito" 
           element={
-            <ProtectedRoute pagina="carrito">
+            <ProtectedRoute pagina="Carrito">
               <Carrito />
             </ProtectedRoute>
           } 
@@ -99,7 +99,7 @@ function App() {
         <Route 
           path="/vista_producto" 
           element={
-            <ProtectedRoute pagina="catalogo">
+            <ProtectedRoute pagina="VistaProducto">
               <VistaProducto />
             </ProtectedRoute>
           } 

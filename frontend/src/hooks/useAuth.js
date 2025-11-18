@@ -54,7 +54,7 @@ export const useAuth = () => {
     const permisos = {
       // Páginas públicas (todos pueden acceder)
       home: ['invitado', 'usuario', 'proveedor', 'administrador'],
-      catalogo: ['invitado', 'usuario', 'proveedor', 'administrador'],
+      Catalogo: ['invitado', 'usuario', 'proveedor', 'administrador'],
       contacto: ['invitado', 'usuario', 'proveedor', 'administrador'],
       carrito: ['invitado', 'usuario', 'proveedor', 'administrador'],
       

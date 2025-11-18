@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS } from "../config/api";
 
 /**
  * Servicio para manejar operaciones relacionadas con categorías y subcategorías
@@ -11,17 +11,17 @@ const categoriaService = {
   async obtenerCategorias() {
     try {
       const response = await fetch(API_ENDPOINTS.PUBLIC_CATEGORIAS, {
-        method: 'GET',
+        method: "GET",
       });
 
       if (!response.ok) {
-        throw new Error('Error al obtener categorías');
+        throw new Error("Error al obtener categorías");
       }
 
       const data = await response.json();
-      return data;
+      return data.data || [];
     } catch (error) {
-      console.error('Error en obtenerCategorias:', error);
+      console.error("Error en obtenerCategorias:", error);
       throw error;
     }
   },
@@ -33,17 +33,17 @@ const categoriaService = {
   async obtenerSubcategorias() {
     try {
       const response = await fetch(API_ENDPOINTS.PUBLIC_SUBCATEGORIAS, {
-        method: 'GET',
+        method: "GET",
       });
 
       if (!response.ok) {
-        throw new Error('Error al obtener subcategorías');
+        throw new Error("Error al obtener subcategorías");
       }
 
       const data = await response.json();
-      return data;
+      return data.data || [];
     } catch (error) {
-      console.error('Error en obtenerSubcategorias:', error);
+      console.error("Error en obtenerSubcategorias:", error);
       throw error;
     }
   },
@@ -58,18 +58,18 @@ const categoriaService = {
       const response = await fetch(
         API_ENDPOINTS.PUBLIC_SUBCATEGORIAS_POR_CATEGORIA(categoriaId),
         {
-          method: 'GET',
+          method: "GET",
         }
       );
 
       if (!response.ok) {
-        throw new Error('Error al obtener subcategorías');
+        throw new Error("Error al obtener subcategorías");
       }
 
       const data = await response.json();
-      return data;
+      return data.data || [];
     } catch (error) {
-      console.error('Error en obtenerSubcategoriasPorCategoria:', error);
+      console.error("Error en obtenerSubcategoriasPorCategoria:", error);
       throw error;
     }
   },
