@@ -1,12 +1,15 @@
+// Catalogo.jsx - ACTUALIZADO para soportar filtros desde URL
 import React, { useState, useEffect } from "react";
 import { ChevronUp } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import categoriaService from "../services/categoriaService";
 import productoService from "../services/productoService";
 import toast from "react-hot-toast";
 
 export default function Catalogo() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
   // Estados para categorías y subcategorías de la BD
   const [categorias, setCategorias] = useState([]);
   const [subcategorias, setSubcategorias] = useState([]);
@@ -18,6 +21,7 @@ export default function Catalogo() {
   const [filtroPrecio, setFiltroPrecio] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("");
   const [filtroSubcategoria, setFiltroSubcategoria] = useState("");
+  const [busquedaTexto, setBusquedaTexto] = useState("");
   const [paginaActual, setPaginaActual] = useState(1);
   const [cargando, setCargando] = useState(true);
   
@@ -27,6 +31,24 @@ export default function Catalogo() {
   useEffect(() => {
     cargarDatos();
   }, []);
+
+  // Leer parámetros de la URL y aplicar filtros
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const categoriaParam = params.get('categoria');
+    const subcategoriaParam = params.get('subcategoria');
+    const searchParam = params.get('search');
+
+    if (categoriaParam) {
+      setFiltroCategoria(categoriaParam);
+    }
+    if (subcategoriaParam) {
+      setFiltroSubcategoria(subcategoriaParam);
+    }
+    if (searchParam) {
+      setBusquedaTexto(searchParam);
+    }
+  }, [location.search]);
 
   // Filtrar subcategorías cuando cambia la categoría seleccionada
   useEffect(() => {
@@ -41,15 +63,18 @@ export default function Catalogo() {
     } else {
       setSubcategoriasFiltradas(subcategorias);
     }
-    // Limpiar filtro de subcategoría al cambiar categoría
-    setFiltroSubcategoria("");
-  }, [filtroCategoria, categorias, subcategorias]);
+    // Limpiar filtro de subcategoría al cambiar categoría si no viene de URL
+    const params = new URLSearchParams(location.search);
+    if (!params.get('subcategoria')) {
+      setFiltroSubcategoria("");
+    }
+  }, [filtroCategoria, categorias, subcategorias, location.search]);
 
   // Aplicar filtros cuando cambien
   useEffect(() => {
     aplicarFiltros();
     setPaginaActual(1);
-  }, [filtroPrecio, filtroCategoria, filtroSubcategoria]);
+  }, [filtroPrecio, filtroCategoria, filtroSubcategoria, busquedaTexto, productos, categorias, subcategorias]);
 
   const cargarDatos = async () => {
     try {
@@ -87,11 +112,17 @@ export default function Catalogo() {
   const aplicarFiltros = () => {
     let filtrados = [...productos];
 
-    // Filtro por precio
-    if (filtroPrecio === "mayor-menor") {
-      filtrados.sort((a, b) => parseFloat(b.precioUnitario) - parseFloat(a.precioUnitario));
-    } else if (filtroPrecio === "menor-mayor") {
-      filtrados.sort((a, b) => parseFloat(a.precioUnitario) - parseFloat(b.precioUnitario));
+    // Filtro por búsqueda de texto
+    if (busquedaTexto) {
+      const busquedaLower = busquedaTexto.toLowerCase().trim();
+      filtrados = filtrados.filter((p) => {
+        const nombreMatch = p.nombre?.toLowerCase().includes(busquedaLower);
+        const categoriaMatch = p.categoriaNombre?.toLowerCase().includes(busquedaLower);
+        const subcategoriaMatch = p.subcategoriaNombre?.toLowerCase().includes(busquedaLower);
+        const empresaMatch = p.nombreEmpresa?.toLowerCase().includes(busquedaLower);
+        const descripcionMatch = p.descripcion?.toLowerCase().includes(busquedaLower);
+        return nombreMatch || categoriaMatch || subcategoriaMatch || empresaMatch || descripcionMatch;
+      });
     }
 
     // Filtro por categoría
@@ -108,6 +139,13 @@ export default function Catalogo() {
       if (subcategoriaSeleccionada) {
         filtrados = filtrados.filter((p) => p.subcategoriaId === subcategoriaSeleccionada.id);
       }
+    }
+
+    // Filtro por precio (ordenamiento)
+    if (filtroPrecio === "mayor-menor") {
+      filtrados.sort((a, b) => parseFloat(b.precioUnitario) - parseFloat(a.precioUnitario));
+    } else if (filtroPrecio === "menor-mayor") {
+      filtrados.sort((a, b) => parseFloat(a.precioUnitario) - parseFloat(b.precioUnitario));
     }
 
     setProductosFiltrados(filtrados);
@@ -144,7 +182,10 @@ export default function Catalogo() {
     setFiltroPrecio("");
     setFiltroCategoria("");
     setFiltroSubcategoria("");
+    setBusquedaTexto("");
     setSubcategoriasFiltradas(subcategorias);
+    // Limpiar URL
+    navigate('/catalogo', { replace: true });
   };
 
   if (cargando) {
@@ -164,6 +205,51 @@ export default function Catalogo() {
         <h1 className="text-4xl font-bold text-gray-800 mb-8 text-left">
           Catálogo de Productos
         </h1>
+
+        {/* Filtros activos - Badges */}
+        {(filtroCategoria || filtroSubcategoria || busquedaTexto) && (
+          <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-4">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-semibold text-gray-700">Filtros activos:</span>
+              {filtroCategoria && (
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-600 text-white rounded-full text-sm">
+                  Categoría: {filtroCategoria}
+                  <button
+                    onClick={() => {
+                      setFiltroCategoria("");
+                      setFiltroSubcategoria("");
+                    }}
+                    className="ml-1 hover:bg-orange-700 rounded-full p-0.5"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              {filtroSubcategoria && (
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-600 text-white rounded-full text-sm">
+                  Subcategoría: {filtroSubcategoria}
+                  <button
+                    onClick={() => setFiltroSubcategoria("")}
+                    className="ml-1 hover:bg-orange-700 rounded-full p-0.5"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              {busquedaTexto && (
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-600 text-white rounded-full text-sm">
+                  Búsqueda: "{busquedaTexto}"
+                  <button
+                    onClick={() => setBusquedaTexto("")}
+                    className="ml-1 hover:bg-orange-700 rounded-full p-0.5"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Filtros */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
@@ -224,6 +310,12 @@ export default function Catalogo() {
         {productosActuales.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">No se encontraron productos con los filtros seleccionados</p>
+            <button
+              onClick={limpiarFiltros}
+              className="mt-4 px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
+            >
+              Ver todos los productos
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6">
