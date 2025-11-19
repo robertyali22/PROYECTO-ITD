@@ -113,6 +113,7 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
 
   return (
     <header className="w-full bg-white shadow-sm border-b border-gray-200">
+      <script src="//code.tidio.co/mbxpg2jgj7sxno5t5iijfxojgwmjrozs.js" async></script>
       {/* TOP: logo (izq) - buscador (centro) - usuario/carrito (derecha) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between gap-4">
