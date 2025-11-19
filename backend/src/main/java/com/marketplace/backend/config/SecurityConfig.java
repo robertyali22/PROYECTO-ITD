@@ -72,7 +72,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "http://localhost:3000",
-                "https://innovacion-snowy.vercel.app" // ← tu frontend real
+                "https://innovacion-snowy.vercel.app",
+                "https://*.vercel.app" // ← tu frontend real
         ));
 
         configuration.setAllowedMethods(Arrays.asList(
