@@ -62,6 +62,7 @@ export default function Home() {
 
   return (
     <main>
+      <script src="//code.tidio.co/mbxpg2jgj7sxno5t5iijfxojgwmjrozs.js" async></script>
       <Hero />
       <section className="max-w-7xl mx-auto px-6 py-16">
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
