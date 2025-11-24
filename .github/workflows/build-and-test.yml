@@ -1,0 +1,73 @@
+name: Build and Test (CI)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # TRABAJO 1: BACKEND (Java + Maven + Tests con Railway)
+  backend-build:
+    name: Backend - Build & Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+        
+    - name: Ejecutar Tests y Empaquetar (Maven Package)
+      # Usamos tus secretos de Railway para que los tests pasen
+      env:
+        DB_URL: ${{ secrets.DB_URL }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      run: |
+        mvn clean package -f backend/pom.xml \
+        -Dspring.datasource.url=${{ secrets.DB_URL }} \
+        -Dspring.datasource.username=${{ secrets.DB_USER }} \
+        -Dspring.datasource.password=${{ secrets.DB_PASSWORD }}
+
+    # Opcional: Guardar el archivo .jar generado como evidencia (Artifact)
+    - name: Subir Artefacto Backend (JAR)
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-jar
+        path: backend/target/*.jar
+
+  # TRABAJO 2: FRONTEND (React + Node)
+  frontend-build:
+    name: Frontend - Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Instalar Dependencias
+      run: npm install
+      
+    - name: Construir Proyecto (Build)
+      run: npm run build
+      
+    # Opcional: Guardar la carpeta dist como evidencia
+    - name: Subir Artefacto Frontend (Dist)
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: frontend/dist
