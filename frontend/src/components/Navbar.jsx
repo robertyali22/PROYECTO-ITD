@@ -16,6 +16,7 @@ import categoriaService from "../services/categoriaService";
 import productoService from "../services/productoService";
 import toast from "react-hot-toast";
 import SearchBar from "./SearchBar";
+import { useCart } from "../context/CartContext";
 
 export default function Navbar({ onLoginClick, onRegisterClick }) {
   const [usuario, setUsuario] = useState(null);
@@ -23,15 +24,16 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [showCategories, setShowCategories] = useState(false);
-  
+
   // Estados para categorías dinámicas
   const [categorias, setCategorias] = useState([]);
   const [subcategorias, setSubcategorias] = useState([]);
   const [cargandoCategorias, setCargandoCategorias] = useState(true);
-  
+
   const menuRef = useRef(null);
   const mobileRef = useRef(null);
   const catRef = useRef(null);
+  const { cartCount } = useCart();
 
   useEffect(() => {
     const u = authService.getCurrentUser();
@@ -58,9 +60,9 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
       setCargandoCategorias(true);
       const [categoriasData, subcategoriasData] = await Promise.all([
         categoriaService.obtenerCategorias(),
-        categoriaService.obtenerSubcategorias()
+        categoriaService.obtenerSubcategorias(),
       ]);
-      
+
       setCategorias(categoriasData);
       setSubcategorias(subcategoriasData);
     } catch (error) {
@@ -73,7 +75,7 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
 
   // Agrupar subcategorías por categoría
   const obtenerSubcategoriasPorCategoria = (categoriaId) => {
-    return subcategorias.filter(sub => sub.categoriaId === categoriaId);
+    return subcategorias.filter((sub) => sub.categoriaId === categoriaId);
   };
 
   const handleCerrarSesion = () => {
@@ -95,14 +97,18 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
   const handleCategoriaClick = (categoriaNombre) => {
     setShowCategories(false);
     setMobileOpen(false);
-    window.location.href = `/catalogo?categoria=${encodeURIComponent(categoriaNombre)}`;
+    window.location.href = `/catalogo?categoria=${encodeURIComponent(
+      categoriaNombre
+    )}`;
   };
 
   // Navegar al catálogo con filtro de categoría y subcategoría
   const handleSubcategoriaClick = (categoriaNombre, subcategoriaNombre) => {
     setShowCategories(false);
     setMobileOpen(false);
-    window.location.href = `/catalogo?categoria=${encodeURIComponent(categoriaNombre)}&subcategoria=${encodeURIComponent(subcategoriaNombre)}`;
+    window.location.href = `/catalogo?categoria=${encodeURIComponent(
+      categoriaNombre
+    )}&subcategoria=${encodeURIComponent(subcategoriaNombre)}`;
   };
 
   const onSearchSubmit = (e) => {
@@ -113,7 +119,10 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
 
   return (
     <header className="w-full bg-white shadow-sm border-b border-gray-200">
-      <script src="//code.tidio.co/mbxpg2jgj7sxno5t5iijfxojgwmjrozs.js" async></script>
+      <script
+        src="//code.tidio.co/mbxpg2jgj7sxno5t5iijfxojgwmjrozs.js"
+        async
+      ></script>
       {/* TOP: logo (izq) - buscador (centro) - usuario/carrito (derecha) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between gap-4">
@@ -151,10 +160,15 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
           <div className="flex items-center gap-3">
             <button
               onClick={() => handleNavigate("/carrito")}
-              className="p-2 text-gray-700 hover:text-orange-700 transition"
+              className="relative p-2 text-gray-700 hover:text-orange-700 transition"
               aria-label="Ver carrito"
             >
               <ShoppingCart size={20} />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
             </button>
 
             {usuario ? (
@@ -294,20 +308,31 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
                     {cargandoCategorias ? (
                       <div className="px-4 py-8 text-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
-                        <p className="mt-2 text-sm text-gray-500">Cargando categorías...</p>
+                        <p className="mt-2 text-sm text-gray-500">
+                          Cargando categorías...
+                        </p>
                       </div>
                     ) : categorias.length === 0 ? (
                       <div className="px-4 py-8 text-center">
-                        <p className="text-sm text-gray-500">No hay categorías disponibles</p>
+                        <p className="text-sm text-gray-500">
+                          No hay categorías disponibles
+                        </p>
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 gap-6 px-4">
                         {categorias.map((categoria) => {
-                          const subs = obtenerSubcategoriasPorCategoria(categoria.id);
+                          const subs = obtenerSubcategoriasPorCategoria(
+                            categoria.id
+                          );
                           return (
-                            <div key={categoria.id} className="flex flex-col gap-2">
+                            <div
+                              key={categoria.id}
+                              className="flex flex-col gap-2"
+                            >
                               <button
-                                onClick={() => handleCategoriaClick(categoria.nombre)}
+                                onClick={() =>
+                                  handleCategoriaClick(categoria.nombre)
+                                }
                                 className="font-semibold text-gray-800 hover:text-orange-600 transition text-left"
                               >
                                 {categoria.nombre}
@@ -317,16 +342,26 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
                                   subs.map((sub) => (
                                     <li key={sub.id}>
                                       <button
-                                        onClick={() => handleSubcategoriaClick(categoria.nombre, sub.nombre)}
+                                        onClick={() =>
+                                          handleSubcategoriaClick(
+                                            categoria.nombre,
+                                            sub.nombre
+                                          )
+                                        }
                                         className="w-full py-1 hover:text-orange-600 cursor-pointer flex items-center justify-between text-left group"
                                       >
                                         <span>{sub.nombre}</span>
-                                        <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <ChevronRight
+                                          size={14}
+                                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                        />
                                       </button>
                                     </li>
                                   ))
                                 ) : (
-                                  <li className="py-1 text-gray-400 text-xs">Sin subcategorías</li>
+                                  <li className="py-1 text-gray-400 text-xs">
+                                    Sin subcategorías
+                                  </li>
                                 )}
                               </ul>
                             </div>
@@ -412,7 +447,9 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
 
             {/* Categorías móvil */}
             <div className="border-t border-gray-100 pt-3">
-              <p className="text-xs font-semibold text-gray-500 mb-2 px-3">CATEGORÍAS</p>
+              <p className="text-xs font-semibold text-gray-500 mb-2 px-3">
+                CATEGORÍAS
+              </p>
               {cargandoCategorias ? (
                 <div className="py-4 text-center">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-600 mx-auto"></div>
@@ -433,7 +470,12 @@ export default function Navbar({ onLoginClick, onRegisterClick }) {
                           {subs.map((sub) => (
                             <button
                               key={sub.id}
-                              onClick={() => handleSubcategoriaClick(categoria.nombre, sub.nombre)}
+                              onClick={() =>
+                                handleSubcategoriaClick(
+                                  categoria.nombre,
+                                  sub.nombre
+                                )
+                              }
                               className="block hover:text-orange-600 w-full text-left py-1"
                             >
                               • {sub.nombre}

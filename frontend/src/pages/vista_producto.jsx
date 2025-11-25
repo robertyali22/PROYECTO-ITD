@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, Heart, ChevronUp } from "lucide-react";
+import { ChevronLeft, Heart, ChevronUp, ShoppingCart } from "lucide-react";
 import productoService from "../services/productoService";
+import { useCart } from "../context/CartContext";
+import authService from "../services/authService";
 import toast from "react-hot-toast";
 
 export default function VistaProducto() {
@@ -9,6 +11,10 @@ export default function VistaProducto() {
   const [imagenActual, setImagenActual] = useState(0);
   const [tabActivo, setTabActivo] = useState("especificaciones");
   const [cantidad, setCantidad] = useState(1);
+  const [agregando, setAgregando] = useState(false);
+
+  // Hook del carrito
+  const { addToCart } = useCart();
 
   useEffect(() => {
     cargarProducto();
@@ -47,6 +53,8 @@ export default function VistaProducto() {
 
         if (productoEncontrado) {
           setProducto(productoEncontrado);
+          // Establecer cantidad inicial como la mínima del producto
+          setCantidad(productoEncontrado.cantidadMinima || 1);
         } else {
           console.error("Producto no encontrado con ID:", productoId);
           toast.error("Producto no encontrado");
@@ -68,6 +76,101 @@ export default function VistaProducto() {
 
   const irAtras = () => {
     window.history.back();
+  };
+
+  // Función para incrementar cantidad
+  const handleIncrementar = () => {
+    if (!producto) return;
+    
+    if (cantidad >= producto.stockDisponible) {
+      toast.error(`Stock máximo disponible: ${producto.stockDisponible}`);
+      return;
+    }
+    
+    setCantidad(cantidad + 1);
+  };
+
+  // Función para decrementar cantidad
+  const handleDecrementar = () => {
+    if (!producto) return;
+    
+    const minima = producto.cantidadMinima || 1;
+    
+    if (cantidad <= minima) {
+      toast.error(`Cantidad mínima de compra: ${minima}`);
+      return;
+    }
+    
+    setCantidad(cantidad - 1);
+  };
+
+  // Función para manejar cambio manual de cantidad
+  const handleCambioCantidad = (e) => {
+    if (!producto) return;
+    
+    const valor = parseInt(e.target.value) || 0;
+    const minima = producto.cantidadMinima || 1;
+    const maxima = producto.stockDisponible;
+    
+    if (valor < minima) {
+      setCantidad(minima);
+      toast.error(`Cantidad mínima de compra: ${minima}`);
+    } else if (valor > maxima) {
+      setCantidad(maxima);
+      toast.error(`Stock máximo disponible: ${maxima}`);
+    } else {
+      setCantidad(valor);
+    }
+  };
+
+  // Función principal para agregar al carrito
+  const handleAgregarAlCarrito = async () => {
+    try {
+      // Verificar autenticación
+      if (!authService.isAuthenticated()) {
+        toast.error("Debes iniciar sesión para agregar productos al carrito");
+        // Opcional: redirigir al login o mostrar modal
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500);
+        return;
+      }
+
+      // Verificar que el producto esté disponible
+      if (!producto.disponible) {
+        toast.error("Este producto no está disponible");
+        return;
+      }
+
+      // Validar cantidad mínima
+      const minima = producto.cantidadMinima || 1;
+      if (cantidad < minima) {
+        toast.error(`La cantidad mínima de compra es ${minima}`);
+        return;
+      }
+
+      // Validar stock
+      if (cantidad > producto.stockDisponible) {
+        toast.error(`Stock insuficiente. Disponible: ${producto.stockDisponible}`);
+        return;
+      }
+
+      setAgregando(true);
+
+      // Usar la función del context
+      const success = await addToCart(producto.id, cantidad);
+
+      if (success) {
+        // Opcional: resetear cantidad a la mínima
+        setCantidad(producto.cantidadMinima || 1);
+      }
+
+    } catch (error) {
+      console.error("Error al agregar al carrito:", error);
+      toast.error(error.message || "Error al agregar al carrito");
+    } finally {
+      setAgregando(false);
+    }
   };
 
   if (cargando) {
@@ -227,38 +330,89 @@ export default function VistaProducto() {
                 </div>
               </div>
 
+              {/* Info de cantidad mínima y stock */}
+              <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex justify-between text-sm">
+                  <span className="text-blue-700">Cantidad mínima:</span>
+                  <span className="font-semibold text-blue-900">
+                    {producto.cantidadMinima} {producto.unidadMedida}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm mt-1">
+                  <span className="text-blue-700">Stock disponible:</span>
+                  <span className="font-semibold text-blue-900">
+                    {producto.stockDisponible} {producto.unidadMedida}
+                  </span>
+                </div>
+              </div>
+
               {/* Cantidad */}
               <div className="mb-6">
-                <p className="text-sm text-gray-600 mb-2">Cantidad</p>
+                <p className="text-sm text-gray-600 mb-2 font-semibold">Cantidad</p>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setCantidad(Math.max(1, cantidad - 1))}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                    onClick={handleDecrementar}
+                    disabled={cantidad <= (producto.cantidadMinima || 1)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold"
                   >
                     −
                   </button>
                   <input
                     type="number"
                     value={cantidad}
-                    onChange={(e) => setCantidad(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-16 text-center border border-gray-300 rounded-lg py-2"
+                    onChange={handleCambioCantidad}
+                    min={producto.cantidadMinima || 1}
+                    max={producto.stockDisponible}
+                    className="w-20 text-center border border-gray-300 rounded-lg py-2 font-semibold"
                   />
                   <button
-                    onClick={() => setCantidad(cantidad + 1)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                    onClick={handleIncrementar}
+                    disabled={cantidad >= producto.stockDisponible}
+                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold"
                   >
                     +
                   </button>
+                  <span className="text-sm text-gray-600 ml-2">
+                    {producto.unidadMedida}
+                  </span>
                 </div>
               </div>
 
               {/* Botón de compra */}
               <button
-                className="w-full py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition text-lg"
-                disabled={!producto.disponible}
+                onClick={handleAgregarAlCarrito}
+                disabled={!producto.disponible || agregando}
+                className="w-full py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Agregar al Carrito ({cantidad})
+                {agregando ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Agregando...</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart size={20} />
+                    <span>
+                      {producto.disponible 
+                        ? `Agregar al Carrito (${cantidad})`
+                        : "No disponible"
+                      }
+                    </span>
+                  </>
+                )}
               </button>
+
+              {/* Subtotal */}
+              {producto.disponible && (
+                <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Subtotal:</span>
+                    <span className="text-xl font-bold text-gray-900">
+                      S/ {(parseFloat(producto.precioUnitario) * cantidad).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

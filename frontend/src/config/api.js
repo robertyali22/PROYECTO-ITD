@@ -35,6 +35,15 @@ export const API_ENDPOINTS = {
   PUBLIC_CATEGORIAS: `${API_BASE_URL}/public/categorias`,
   PUBLIC_SUBCATEGORIAS: `${API_BASE_URL}/public/categorias/subcategorias`,
   PUBLIC_SUBCATEGORIAS_POR_CATEGORIA: (categoriaId) => `${API_BASE_URL}/public/categorias/${categoriaId}/subcategorias`,
+
+  // Carrito
+  CARRITO_AGREGAR: `${API_BASE_URL}/usuario/carrito`,
+  CARRITO_OBTENER: `${API_BASE_URL}/usuario/carrito`,
+  CARRITO_COUNT: `${API_BASE_URL}/usuario/carrito/count`,
+  CARRITO_ACTUALIZAR: (carritoId) => `${API_BASE_URL}/usuario/carrito/${carritoId}`,
+  CARRITO_ELIMINAR: (carritoId) => `${API_BASE_URL}/usuario/carrito/${carritoId}`,
+  CARRITO_VACIAR: `${API_BASE_URL}/usuario/carrito`,
+  CARRITO_LIMPIAR: `${API_BASE_URL}/usuario/carrito/limpiar`,
 };
 
 export default API_BASE_URL;
