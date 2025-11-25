@@ -1,14 +1,50 @@
 import React, { useState } from "react";
-import { Wrench } from "lucide-react";
+import { Send } from "lucide-react";
 
 export default function Contacto() {
-  const [enviado, setEnviado] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: "",
+    email: "",
+    asunto: "",
+    mensaje: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // formulario sin funcionamiento real: solo mostrar confirmación visual
-    setEnviado(true);
-    setTimeout(() => setEnviado(false), 4500);
+
+    if (!formData.nombre || !formData.mensaje) {
+      alert("Por favor completa al menos nombre y mensaje.");
+      return;
+    }
+
+    const telefono = "51960142988";
+
+    const textoMensaje = `
+Hola *Faraón*, tengo una nueva consulta desde la web:
+
+👤 *Nombre:* ${formData.nombre}
+📧 *Email:* ${formData.email}
+blob *Asunto:* ${formData.asunto}
+📝 *Mensaje:* ${formData.mensaje}
+
+Espero su respuesta.
+    `.trim();
+
+    const url = `https://wa.me/${telefono}?text=${encodeURIComponent(
+      textoMensaje
+    )}`;
+
+    window.open(url, "_blank");
+
+    setFormData({ nombre: "", email: "", asunto: "", mensaje: "" });
   };
 
   return (
@@ -18,15 +54,18 @@ export default function Contacto() {
         <section className="space-y-6">
           <h1 className="text-4xl font-extrabold text-gray-900">Contáctanos</h1>
           <p className="text-gray-600 text-lg">
-            ¿Tienes dudas, comentarios o necesitas ayuda con un pedido? Nuestro equipo está listo para asistirte.
-            Completa el formulario o utiliza la información de contacto para comunicarte directamente.
+            ¿Tienes dudas, comentarios o necesitas ayuda con un pedido? Nuestro
+            equipo está listo para asistirte. Completa el formulario y te
+            responderemos vía WhatsApp automáticamente.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-800">Soporte</h3>
               <p className="text-sm text-gray-600 mt-1">soporte@faraon.com</p>
-              <p className="text-sm text-gray-500 mt-2">Horario: Lun-Vie 9:00 - 18:00</p>
+              <p className="text-sm text-gray-500 mt-2">
+                Horario: Lun-Vie 9:00 - 18:00
+              </p>
             </div>
 
             <div className="p-4 bg-white rounded-lg shadow-sm border border-gray-100">
@@ -38,13 +77,15 @@ export default function Contacto() {
 
           <div className="mt-4 bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100">
             <div className="p-6">
-              <h4 className="font-semibold text-gray-800 mb-2">¿Prefieres escribir?</h4>
-              <p className="text-sm text-gray-600">Usa el formulario y te responderemos lo antes posible.</p>
+              <h4 className="font-semibold text-gray-800 mb-2">Ubicación</h4>
+              <p className="text-sm text-gray-600">
+                Visítanos en nuestra tienda principal.
+              </p>
             </div>
             <div className="w-full h-48 bg-gray-100 overflow-hidden">
               <iframe
                 title="Ubicación Faraón"
-                src="https://www.google.com/maps/embed?pb=!1m10!1m8!1m3!1d2758.88743436715!2d-77.033918049993!3d-12.067171369579789!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2spe!4v1763481287060!5m2!1ses!2spe"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3901.666994165686!2d-77.03907722425555!3d-12.066442642270928!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c8ea50161bb5%3A0x6734e5695029e00b!2sUniversidad%20Tecnol%C3%B3gica%20del%20Per%C3%BA!5e0!3m2!1ses!2spe!4v1716335123456!5m2!1ses!2spe"
                 className="w-full h-full border-0"
                 style={{ border: 0 }}
                 allowFullScreen
@@ -58,72 +99,96 @@ export default function Contacto() {
         {/* Form */}
         <section>
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Envíanos tu consulta</h2>
-            <p className="text-sm text-gray-600 mb-4">Rellena el formulario y te responderemos a la brevedad.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Envíanos tu consulta
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Serás redirigido a WhatsApp para enviar tu mensaje.
+            </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
                   type="text"
                   name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
                   placeholder="Nombre"
                   className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  required
                 />
                 <input
                   type="email"
                   name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="Correo electrónico"
                   className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
               </div>
 
               <div>
-                <label className="text-sm text-gray-700 mb-1 block">Asunto</label>
-                <select className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <label className="text-sm text-gray-700 mb-1 block">
+                  Asunto
+                </label>
+                <select
+                  name="asunto"
+                  value={formData.asunto}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
                   <option value="">Escoge el problema...</option>
-                  <option value="consulta">Consulta general</option>
-                  <option value="pedido">Problema con pedido</option>
-                  <option value="tecnico">Soporte técnico</option>
-                  <option value="sugerencia">Sugerencia</option>
-                  <option value="otro">Otro</option>
+                  <option value="Consulta General">Consulta general</option>
+                  <option value="Problema Pedido">Problema con pedido</option>
+                  <option value="Soporte Tecnico">Soporte técnico</option>
+                  <option value="Sugerencia">Sugerencia</option>
+                  <option value="Otro">Otro</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-sm text-gray-700 mb-1 block">Mensaje</label>
+                <label className="text-sm text-gray-700 mb-1 block">
+                  Mensaje
+                </label>
                 <textarea
                   name="mensaje"
+                  value={formData.mensaje}
+                  onChange={handleChange}
                   rows="6"
                   placeholder="Cuéntanos con detalle tu consulta..."
                   className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  required
                 />
               </div>
 
               <div className="flex items-center gap-3">
                 <button
                   type="submit"
-                  className="px-5 py-3 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition"
+                  className="px-5 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition flex items-center gap-2"
                 >
-                  Enviar consulta
+                  <Send size={18} />
+                  Enviar a WhatsApp
                 </button>
                 <button
                   type="button"
-                  onClick={() => document.querySelector('form')?.reset()}
-                  className="px-4 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition"
+                  onClick={() =>
+                    setFormData({
+                      nombre: "",
+                      email: "",
+                      asunto: "",
+                      mensaje: "",
+                    })
+                  }
+                  className="px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
                 >
                   Limpiar
                 </button>
               </div>
-
-              {enviado && (
-                <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-md border border-green-100">
-                  Gracias — tu mensaje quedó registrado (demo).
-                </div>
-              )}
             </form>
 
             <p className="mt-6 text-xs text-gray-500">
-              Nota: este formulario es solo de demostración y no envía datos a un servidor.
+              Al hacer clic en enviar, se abrirá WhatsApp Web o la App con tu
+              mensaje pre-redactado.
             </p>
           </div>
         </section>
