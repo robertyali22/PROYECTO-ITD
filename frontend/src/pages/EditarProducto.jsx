@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Save, Plus, X, Image as ImageIcon, Trash2 } from 'lucide-react';
-import { useParams } from 'react-router-dom';
-import productoService from '../services/productoService';
-import categoriaService from '../services/categoriaService';
+import React, { useState, useEffect } from "react";
+import {
+  ArrowLeft,
+  Save,
+  Plus,
+  X,
+  Image as ImageIcon,
+  Trash2,
+} from "lucide-react";
+import { useParams } from "react-router-dom";
+import productoService from "../services/productoService";
+import categoriaService from "../services/categoriaService";
 
 export default function EditarProducto() {
   const { id } = useParams(); // Obtener ID del producto de la URL
@@ -10,27 +17,35 @@ export default function EditarProducto() {
   const [guardando, setGuardando] = useState(false);
   const [categorias, setCategorias] = useState([]);
   const [subcategorias, setSubcategorias] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [producto, setProducto] = useState(null);
-  
+
   const [formData, setFormData] = useState({
-    categoriaId: '',
-    subcategoriaId: '',
-    nombre: '',
-    descripcion: '',
-    precioUnitario: '',
-    unidadMedida: 'kg',
-    cantidadMinima: '1',
-    stockDisponible: '0',
-    disponible: true
+    categoriaId: "",
+    subcategoriaId: "",
+    nombre: "",
+    descripcion: "",
+    precioUnitario: "",
+    unidadMedida: "kg",
+    cantidadMinima: "1",
+    stockDisponible: "0",
+    disponible: true,
   });
 
   const [imagenes, setImagenes] = useState([]);
-  const [nuevaImagen, setNuevaImagen] = useState('');
+  const [nuevaImagen, setNuevaImagen] = useState("");
 
   const unidadesMedida = [
-    'kg', 'gramos', 'unidad', 'caja', 'saco', 'bolsa', 
-    'litro', 'metro', 'docena', 'paquete'
+    "kg",
+    "gramos",
+    "unidad",
+    "caja",
+    "saco",
+    "bolsa",
+    "litro",
+    "metro",
+    "docena",
+    "paquete",
   ];
 
   useEffect(() => {
@@ -48,23 +63,26 @@ export default function EditarProducto() {
 
   const cargarCategorias = async () => {
     try {
-      const response = await categoriaService.obtenerCategorias();
-      if (response.success) {
-        setCategorias(response.data);
+      const data = await categoriaService.obtenerCategorias();
+      // El servicio devuelve el array directamente, no un objeto con .success
+      if (Array.isArray(data)) {
+        setCategorias(data);
       }
     } catch (err) {
-      console.error('Error al cargar categorías:', err);
+      console.error("Error al cargar categorías:", err);
     }
   };
 
   const cargarSubcategorias = async (categoriaId) => {
     try {
-      const response = await categoriaService.obtenerSubcategoriasPorCategoria(categoriaId);
-      if (response.success) {
-        setSubcategorias(response.data);
+      const data = await categoriaService.obtenerSubcategoriasPorCategoria(
+        categoriaId
+      );
+      if (Array.isArray(data)) {
+        setSubcategorias(data);
       }
     } catch (err) {
-      console.error('Error al cargar subcategorías:', err);
+      console.error("Error al cargar subcategorías:", err);
     }
   };
 
@@ -72,26 +90,28 @@ export default function EditarProducto() {
     try {
       setLoading(true);
       const response = await productoService.obtenerProductoPorId(id);
-      
+
       if (response.success) {
         const prod = response.data;
         setProducto(prod);
         setImagenes(prod.imagenes || []);
-        
+
         setFormData({
           categoriaId: prod.categoriaId.toString(),
-          subcategoriaId: prod.subcategoriaId ? prod.subcategoriaId.toString() : '',
+          subcategoriaId: prod.subcategoriaId
+            ? prod.subcategoriaId.toString()
+            : "",
           nombre: prod.nombre,
-          descripcion: prod.descripcion || '',
+          descripcion: prod.descripcion || "",
           precioUnitario: prod.precioUnitario.toString(),
           unidadMedida: prod.unidadMedida,
           cantidadMinima: prod.cantidadMinima.toString(),
           stockDisponible: prod.stockDisponible.toString(),
-          disponible: prod.disponible
+          disponible: prod.disponible,
         });
       }
     } catch (err) {
-      setError(err.message || 'Error al cargar producto');
+      setError(err.message || "Error al cargar producto");
     } finally {
       setLoading(false);
     }
@@ -99,9 +119,9 @@ export default function EditarProducto() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -109,52 +129,55 @@ export default function EditarProducto() {
     if (!nuevaImagen.trim()) return;
 
     try {
-      const response = await productoService.agregarImagen(id, nuevaImagen.trim());
-      
+      const response = await productoService.agregarImagen(
+        id,
+        nuevaImagen.trim()
+      );
+
       if (response.success) {
-        setImagenes(prev => [...prev, response.data]);
-        setNuevaImagen('');
+        setImagenes((prev) => [...prev, response.data]);
+        setNuevaImagen("");
       }
     } catch (err) {
-      alert(err.message || 'Error al agregar imagen');
+      alert(err.message || "Error al agregar imagen");
     }
   };
 
   const eliminarImagen = async (imagenId) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta imagen?')) {
+    if (!window.confirm("¿Estás seguro de eliminar esta imagen?")) {
       return;
     }
 
     try {
       const response = await productoService.eliminarImagen(id, imagenId);
-      
+
       if (response.success) {
-        setImagenes(prev => prev.filter(img => img.id !== imagenId));
+        setImagenes((prev) => prev.filter((img) => img.id !== imagenId));
       }
     } catch (err) {
-      alert(err.message || 'Error al eliminar imagen');
+      alert(err.message || "Error al eliminar imagen");
     }
   };
 
   const validarFormulario = () => {
     if (!formData.categoriaId) {
-      setError('Debes seleccionar una categoría');
+      setError("Debes seleccionar una categoría");
       return false;
     }
     if (!formData.nombre.trim()) {
-      setError('El nombre del producto es obligatorio');
+      setError("El nombre del producto es obligatorio");
       return false;
     }
     if (!formData.precioUnitario || parseFloat(formData.precioUnitario) <= 0) {
-      setError('El precio debe ser mayor a 0');
+      setError("El precio debe ser mayor a 0");
       return false;
     }
     if (!formData.cantidadMinima || parseInt(formData.cantidadMinima) < 1) {
-      setError('La cantidad mínima debe ser al menos 1');
+      setError("La cantidad mínima debe ser al menos 1");
       return false;
     }
     if (!formData.stockDisponible || parseInt(formData.stockDisponible) < 0) {
-      setError('El stock no puede ser negativo');
+      setError("El stock no puede ser negativo");
       return false;
     }
     return true;
@@ -162,7 +185,7 @@ export default function EditarProducto() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!validarFormulario()) {
       return;
@@ -173,24 +196,29 @@ export default function EditarProducto() {
 
       const datosActualizados = {
         categoriaId: parseInt(formData.categoriaId),
-        subcategoriaId: formData.subcategoriaId ? parseInt(formData.subcategoriaId) : null,
+        subcategoriaId: formData.subcategoriaId
+          ? parseInt(formData.subcategoriaId)
+          : null,
         nombre: formData.nombre.trim(),
         descripcion: formData.descripcion.trim(),
         precioUnitario: parseFloat(formData.precioUnitario),
         unidadMedida: formData.unidadMedida,
         cantidadMinima: parseInt(formData.cantidadMinima),
         stockDisponible: parseInt(formData.stockDisponible),
-        disponible: formData.disponible
+        disponible: formData.disponible,
       };
 
-      const response = await productoService.actualizarProducto(id, datosActualizados);
+      const response = await productoService.actualizarProducto(
+        id,
+        datosActualizados
+      );
 
       if (response.success) {
-        alert('Producto actualizado exitosamente');
-        window.location.href = '/proveedor/productos';
+        alert("Producto actualizado exitosamente");
+        window.location.href = "/proveedor/productos";
       }
     } catch (err) {
-      setError(err.message || 'Error al actualizar producto');
+      setError(err.message || "Error al actualizar producto");
     } finally {
       setGuardando(false);
     }
@@ -213,7 +241,7 @@ export default function EditarProducto() {
         <div className="text-center">
           <p className="text-red-600 text-lg">Producto no encontrado</p>
           <button
-            onClick={() => window.location.href = '/proveedor/productos'}
+            onClick={() => (window.location.href = "/proveedor/productos")}
             className="mt-4 text-orange-600 hover:text-orange-700"
           >
             Volver a mis productos
@@ -229,14 +257,16 @@ export default function EditarProducto() {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => window.location.href = '/proveedor/productos'}
+            onClick={() => (window.location.href = "/proveedor/productos")}
             className="text-gray-600 hover:text-gray-900 flex items-center gap-2 mb-4"
           >
             <ArrowLeft size={20} />
             Volver a mis productos
           </button>
           <h1 className="text-3xl font-bold text-gray-900">Editar Producto</h1>
-          <p className="text-gray-600 mt-1">Actualiza la información de tu producto</p>
+          <p className="text-gray-600 mt-1">
+            Actualiza la información de tu producto
+          </p>
         </div>
 
         {/* Error message */}
@@ -250,7 +280,9 @@ export default function EditarProducto() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Información básica */}
           <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Información Básica</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Información Básica
+            </h2>
 
             {/* Categorías */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -266,7 +298,7 @@ export default function EditarProducto() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
                   <option value="">Selecciona una categoría</option>
-                  {categorias.map(cat => (
+                  {categorias.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.nombre}
                     </option>
@@ -286,7 +318,7 @@ export default function EditarProducto() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100"
                 >
                   <option value="">Selecciona una subcategoría</option>
-                  {subcategorias.map(sub => (
+                  {subcategorias.map((sub) => (
                     <option key={sub.id} value={sub.id}>
                       {sub.nombre}
                     </option>
@@ -354,7 +386,7 @@ export default function EditarProducto() {
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
-                  {unidadesMedida.map(unidad => (
+                  {unidadesMedida.map((unidad) => (
                     <option key={unidad} value={unidad}>
                       {unidad}
                     </option>
@@ -406,7 +438,10 @@ export default function EditarProducto() {
                 onChange={handleChange}
                 className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
               />
-              <label htmlFor="disponible" className="text-sm font-medium text-gray-700">
+              <label
+                htmlFor="disponible"
+                className="text-sm font-medium text-gray-700"
+              >
                 Producto disponible para la venta
               </label>
             </div>
@@ -414,8 +449,10 @@ export default function EditarProducto() {
 
           {/* Imágenes */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Imágenes</h2>
-            
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Imágenes
+            </h2>
+
             {/* Agregar nueva imagen */}
             <div className="flex gap-2 mb-4">
               <input
@@ -446,7 +483,8 @@ export default function EditarProducto() {
                       alt="Producto"
                       className="w-full h-40 object-cover rounded-lg"
                       onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/400x300?text=Error';
+                        e.target.src =
+                          "https://via.placeholder.com/400x300?text=Error";
                       }}
                     />
                     <button
@@ -471,7 +509,7 @@ export default function EditarProducto() {
           <div className="flex gap-4">
             <button
               type="button"
-              onClick={() => window.location.href = '/proveedor/productos'}
+              onClick={() => (window.location.href = "/proveedor/productos")}
               className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
               Cancelar

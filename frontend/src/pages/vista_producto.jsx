@@ -209,7 +209,7 @@ export default function VistaProducto() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header con botón atrás */}
-      <div className="bg-white border-b border-gray-200 p-4 sticky top-0 z-40">
+      <div className="bg-white border-b border-gray-200 p-4 sticky">
         <div className="max-w-7xl mx-auto flex items-center gap-4">
           <button
             onClick={irAtras}
