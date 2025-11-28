@@ -114,7 +114,7 @@ public class ProductoService {
      * Actualizar producto (proveedor)
      */
     @Transactional
-    public ProductoDTO actualizarProducto(Long usuarioId, Long productoId, ActualizarProductoDTO dto) {
+    public ProductoDTO actualizarProducto(Long usuarioId,Long productoId, ActualizarProductoDTO dto) {
         log.info("Actualizando producto {} del usuario {}", productoId, usuarioId);
         
         Proveedor proveedor = proveedorRepository.findByUsuarioId(usuarioId)

@@ -7,5 +7,5 @@ import java.util.List;
 public interface DetallePedidoRepository extends JpaRepository<DetallePedido, Long> {
     
     // Spring Data JPA es inteligente: navega de DetallePedido -> Pedido -> FechaPedido
-    List<DetallePedido> findByProveedorIdOrderByPedidoFechaPedidoDesc(Integer proveedorId);
+    List<DetallePedido> findByProveedorIdOrderByPedidoFechaPedidoDesc(Long proveedorId);
 }

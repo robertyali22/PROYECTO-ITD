@@ -101,7 +101,7 @@ export default function Carrito() {
           await refreshCount(); // Actualizar contador del navbar
 
           // Redirigir a "Mis Pedidos"
-          navigate("/mis-pedidos"); 
+          navigate("/mispedidos"); 
 
       } catch (error) {
           toast.error(error.message || "Error al procesar la compra");

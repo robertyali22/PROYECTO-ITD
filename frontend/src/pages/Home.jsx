@@ -180,7 +180,7 @@ export default function Home() {
             >
               {/* Aquí irá tu imagen de banner principal grande */}
               <p className="text-white text-2xl font-bold opacity-50">
-                <img src="" alt="" />
+                
               </p>
             </div>
           ))}
@@ -270,27 +270,15 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Banner 1 */}
           <div className="h-56 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer bg-gray-200">
-            <img
-              src="https://via.placeholder.com/400x250/orange/white?text=Banner+Oferta+1"
-              alt="Banner 1"
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-            />
+            
           </div>
           {/* Banner 2 */}
           <div className="h-56 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer bg-gray-200">
-            <img
-              src="https://via.placeholder.com/400x250/fb923c/white?text=Banner+Oferta+2"
-              alt="Banner 2"
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-            />
+            
           </div>
           {/* Banner 3 */}
           <div className="h-56 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer bg-gray-200">
-            <img
-              src="https://via.placeholder.com/400x250/f97316/white?text=Banner+Oferta+3"
-              alt="Banner 3"
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-            />
+            
           </div>
         </div>
       </section>

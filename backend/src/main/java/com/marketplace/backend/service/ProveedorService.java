@@ -114,7 +114,7 @@ public class ProveedorService {
      * Si se aprueba, cambia el rol del usuario a proveedor
      */
     @Transactional
-    public ProveedorDTO cambiarEstadoSolicitud(Long proveedorId, String nuevoEstado) {
+    public ProveedorDTO cambiarEstadoSolicitud( Long proveedorId, String nuevoEstado) {
         log.info("Cambiando estado de proveedor {} a {}", proveedorId, nuevoEstado);
         
         Proveedor proveedor = proveedorRepository.findById(proveedorId)
@@ -156,7 +156,7 @@ public class ProveedorService {
      * Cambiar rol de un usuario directamente (admin)
      */
     @Transactional
-    public void cambiarRolUsuario(Long usuarioId, CambiarRolUsuarioDTO dto) {
+    public void cambiarRolUsuario( Long usuarioId, CambiarRolUsuarioDTO dto) {
         log.info("Cambiando rol de usuario {} a {}", usuarioId, dto.getRol());
         
         Usuario usuario = usuarioRepository.findById(usuarioId)

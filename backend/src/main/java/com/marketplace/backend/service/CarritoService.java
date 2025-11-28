@@ -130,7 +130,7 @@ private final CarritoRepository carritoRepository;
      * Actualizar cantidad de un producto en el carrito
      */
     @Transactional
-    public CarritoItemDTO actualizarCantidad(Long usuarioId, Long carritoId, ActualizarCantidadDTO dto) {
+    public CarritoItemDTO actualizarCantidad(Long usuarioId,Long carritoId, ActualizarCantidadDTO dto) {
         log.info("Actualizando cantidad del item {} del usuario {}", carritoId, usuarioId);
         
         Carrito carrito = carritoRepository.findById(carritoId)
@@ -164,7 +164,7 @@ private final CarritoRepository carritoRepository;
      * Eliminar un producto del carrito
      */
     @Transactional
-    public void eliminarProducto(Long usuarioId, Long carritoId) {
+    public void eliminarProducto(Long usuarioId,Long carritoId) {
         log.info("Eliminando item {} del carrito del usuario {}", carritoId, usuarioId);
         
         Carrito carrito = carritoRepository.findById(carritoId)
