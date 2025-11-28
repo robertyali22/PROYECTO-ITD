@@ -67,4 +67,15 @@ public class ProductoDTO {
     
     @JsonProperty("imagenes")
     private List<ImagenProductoDTO> imagenes;
+
+    /**
+     * Campo calculado para el enlace directo del producto.
+     * Jackson lo incluirá automáticamente en el JSON como "urlProducto"
+     */
+    @JsonProperty("urlProducto")
+    public String getUrlProducto() {
+        if (this.id == null) return null;
+        // Ajusta esta URL base si en el futuro cambia tu dominio
+        return "https://innovacion-snowy.vercel.app/vista_producto?id=" + this.id;
+    }
 }
