@@ -62,6 +62,7 @@ export const useAuth = () => {
       miperfil: ['usuario', 'proveedor', 'administrador'],
       mispedidos: ['usuario', 'proveedor', 'administrador'],
       solicitarproveedor: ['usuario', 'proveedor', 'administrador'],
+      detallepedido: ['usuario', 'proveedor', 'administrador'],
       
       // Páginas exclusivas de proveedor
       ReportesP: ['proveedor'],

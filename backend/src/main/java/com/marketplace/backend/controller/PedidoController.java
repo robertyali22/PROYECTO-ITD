@@ -2,6 +2,7 @@ package com.marketplace.backend.controller;
 
 import com.marketplace.backend.dominio.Pedido;
 import com.marketplace.backend.dto.CrearPedidoDTO;
+import com.marketplace.backend.dto.PedidoDetalleCompletoDTO;
 import com.marketplace.backend.security.JwtUtil;
 import com.marketplace.backend.service.PedidoService;
 import jakarta.validation.Valid;
@@ -41,7 +42,7 @@ public class PedidoController {
     public ResponseEntity<?> realizarPedido(
             @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody CrearPedidoDTO dto) {
-        
+
         Map<String, Object> response = new HashMap<>();
         try {
             String token = authHeader.substring(7);
@@ -52,13 +53,42 @@ public class PedidoController {
             response.put("success", true);
             response.put("message", "Pedido realizado con éxito");
             response.put("numeroPedido", pedido.getNumeroPedido());
-            
+
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @GetMapping("/{pedidoId}/detalles")
+    public ResponseEntity<?> obtenerDetallePedido(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long pedidoId) {
+        try {
+            String token = authHeader.substring(7);
+            Long usuarioId = jwtUtil.extraerUserId(token);
+
+            PedidoDetalleCompletoDTO detalle = pedidoService.obtenerDetallePedido(pedidoId, usuarioId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", detalle);
+
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Error al obtener el detalle del pedido");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
 }

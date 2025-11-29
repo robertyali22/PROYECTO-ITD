@@ -44,6 +44,10 @@ export const API_ENDPOINTS = {
   CARRITO_ELIMINAR: (carritoId) => `${API_BASE_URL}/usuario/carrito/${carritoId}`,
   CARRITO_VACIAR: `${API_BASE_URL}/usuario/carrito`,
   CARRITO_LIMPIAR: `${API_BASE_URL}/usuario/carrito/limpiar`,
+
+  // ⭐ NUEVO: Pedidos
+  PEDIDOS_MIS_PEDIDOS: `${API_BASE_URL}/pedidos/mis-pedidos`,
+  PEDIDOS_DETALLE: (pedidoId) => `${API_BASE_URL}/pedidos/${pedidoId}/detalles`,
 };
 
 export default API_BASE_URL;

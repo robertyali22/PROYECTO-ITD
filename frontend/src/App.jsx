@@ -12,6 +12,7 @@ import Carrito from "./pages/Carrito";
 import Contacto from "./pages/Contacto";
 import Mispedidos from "./pages/Mispedidos";
 import VistaProducto from "./pages/vista_producto";
+import DetallePedido from "./pages/DetallePedido"; 
 import SolicitarProveedor from "./pages/SolicitarProveedor";
 import ReportesP from "./pages/reportesP";
 import MisProductos from "./pages/Misproductos";
@@ -126,6 +127,15 @@ function App() {
             element={
               <ProtectedRoute pagina="mispedidos">
                 <Mispedidos />
+              </ProtectedRoute>
+            } 
+          />
+          {/* ⭐ NUEVA RUTA: Detalle de Pedido */}
+          <Route 
+            path="/mispedidos/:pedidoId" 
+            element={
+              <ProtectedRoute pagina="detallepedido">
+                <DetallePedido />
               </ProtectedRoute>
             } 
           />
