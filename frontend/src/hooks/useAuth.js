@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import authService from '../services/authService';
+import Checkout from '../pages/Checkout';
 
 /**
  * Hook personalizado para manejar autenticación y autorización
@@ -57,6 +58,7 @@ export const useAuth = () => {
       Catalogo: ['invitado', 'usuario', 'proveedor', 'administrador'],
       contacto: ['invitado', 'usuario', 'proveedor', 'administrador'],
       carrito: ['invitado', 'usuario', 'proveedor', 'administrador'],
+      Checkout: ['invitado', 'usuario', 'proveedor', 'administrador'],
       
       // Páginas que requieren login
       miperfil: ['usuario', 'proveedor', 'administrador'],
@@ -69,6 +71,7 @@ export const useAuth = () => {
       misproductos: ['proveedor'],
       crearproducto: ['proveedor'],
       editarproducto: ['proveedor'],
+      
       
       // Página exclusiva de administrador
       administrativa: ['administrador'],

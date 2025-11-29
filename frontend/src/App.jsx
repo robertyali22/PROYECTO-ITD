@@ -21,8 +21,7 @@ import EditarProducto from "./pages/EditarProducto";
 import LoginModal from "./components/LoginModal";
 import RegistroModal from "./components/RegistroModal";
 import ProtectedRoute from "./components/ProtectedRoute";
-import MisVentas from './pages/MisVentas';
-
+import Checkout from "./pages/Checkout";
 // ✨ IMPORTACIÓN DEL CART PROVIDER
 import { CartProvider } from "./context/CartContext";
 
@@ -103,6 +102,15 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          {/* Ruta para checkout de carrito */}
+          <Route 
+            path="/Checkout" 
+            element={
+              <ProtectedRoute pagina="Checkout">
+                <Checkout />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             path="/vista_producto" 
             element={
@@ -149,6 +157,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          
 
           {/* ========== RUTAS EXCLUSIVAS PARA PROVEEDOR ========== */}
           {/* Solo accesibles para usuarios con rol 'proveedor' */}

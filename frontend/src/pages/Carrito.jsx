@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Para redirigir
+import { useNavigate } from "react-router-dom";
 import {
   ShoppingCart,
   Trash2,
@@ -19,12 +19,6 @@ export default function Carrito() {
   const [loading, setLoading] = useState(true);
   const { refreshCount } = useCart();
   const navigate = useNavigate();
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [datosEntrega, setDatosEntrega] = useState({
-      direccionEntrega: "",
-      telefonoContacto: "",
-      metodoPago: "TARJETA"
-  });
 
   useEffect(() => {
     cargarCarrito();
@@ -35,7 +29,8 @@ export default function Carrito() {
       setLoading(true);
 
       if (!authService.isAuthenticated()) {
-        window.location.href = "/";
+        // Opcional: Podrías usar navigate("/login") en lugar de window.location
+        window.location.href = "/"; 
         return;
       }
 
@@ -83,30 +78,6 @@ export default function Carrito() {
     } catch (error) {
       toast.error(error.message || "Error al vaciar carrito");
     }
-  };
-
-  const handleCheckout = async (e) => {
-      e.preventDefault();
-
-      if(!datosEntrega.direccionEntrega || !datosEntrega.telefonoContacto){
-          toast.error("Por favor completa todos los campos");
-          return;
-      }
-
-      try {
-          setLoading(true); // Reutilizamos tu estado loading
-          await cartService.realizarPedido(datosEntrega);
-
-          toast.success("¡Pedido realizado con éxito!");
-          await refreshCount(); // Actualizar contador del navbar
-
-          // Redirigir a "Mis Pedidos"
-          navigate("/mispedidos"); 
-
-      } catch (error) {
-          toast.error(error.message || "Error al procesar la compra");
-          setLoading(false); // Solo quitamos loading si falla, si es éxito navegamos
-      }
   };
 
   if (loading) {
@@ -197,11 +168,13 @@ export default function Carrito() {
                 </div>
               </div>
 
+              {/* Botón que ahora lleva al Checkout */}
               <button 
-                  onClick={() => setIsCheckoutOpen(true)}
-                  className="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition font-semibold"
+                  onClick={() => navigate("/checkout")}
+                  className="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition font-semibold flex justify-center items-center gap-2"
               >
                   Proceder al pago
+                  <ArrowRight size={20} />
               </button>
 
               <p className="text-xs text-gray-500 text-center mt-4">
@@ -211,104 +184,11 @@ export default function Carrito() {
           </div>
         </div>
       </div>
-      
-      {/* Modal de Checkout */}
-      {isCheckoutOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-     
-          <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
-            onClick={() => setIsCheckoutOpen(false)}
-          ></div>
-
-          <div className="relative bg-white rounded-xl shadow-2xl p-6 max-w-md w-full z-10">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">
-              Finalizar Compra
-            </h2>
-            
-            <form onSubmit={handleCheckout} className="space-y-5">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Dirección de Entrega
-                </label>
-                <input
-                  type="text"
-                  required
-                  className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
-                  placeholder="Ej: Av. Principal 123, Lima"
-                  value={datosEntrega.direccionEntrega}
-                  onChange={(e) =>
-                    setDatosEntrega({
-                      ...datosEntrega,
-                      direccionEntrega: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Teléfono de Contacto
-                </label>
-                <input
-                  type="tel"
-                  required
-                  className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
-                  placeholder="Ej: 999 999 999"
-                  value={datosEntrega.telefonoContacto}
-                  onChange={(e) =>
-                    setDatosEntrega({
-                      ...datosEntrega,
-                      telefonoContacto: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Método de Pago
-                </label>
-                <select
-                  className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none bg-white transition"
-                  value={datosEntrega.metodoPago}
-                  onChange={(e) =>
-                    setDatosEntrega({
-                      ...datosEntrega,
-                      metodoPago: e.target.value,
-                    })
-                  }
-                >
-                  <option value="TARJETA">Tarjeta de Crédito/Débito</option>
-                  <option value="YAPE">Yape / Plin</option>
-                  <option value="EFECTIVO">Pago contraentrega</option>
-                </select>
-              </div>
-
-              <div className="flex gap-3 mt-8 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsCheckoutOpen(false)}
-                  className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium shadow-md transition"
-                >
-                  Confirmar Pedido
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-// Componente para cada item del carrito
+// Componente para cada item del carrito (Se mantiene igual, solo lógica visual)
 function CarritoItem({ item, onActualizar, onEliminar }) {
   const [cantidad, setCantidad] = useState(item.cantidad);
   const [actualizando, setActualizando] = useState(false);
